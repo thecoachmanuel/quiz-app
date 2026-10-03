@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Offline - Your are offline</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%);
+        color: #333;
+        font-family: "Poppins", sans-serif;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      h1 {
+        font-size: 2.2rem;
+        margin-bottom: 0.3rem;
+      }
+
+      p {
+        font-size: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      canvas {
+        border: 2px solid rgba(255, 255, 255, 0.7);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .stats {
+        margin-top: 1rem;
+        font-size: 0.95rem;
+      }
+
+      .footer {
+        position: absolute;
+        bottom: 8px;
+        font-size: 0.8rem;
+        color: #555;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🦖 Play dino runner until you are offline</h1>
+    <a href=".">Reload</a>
+    <p>Tap or press <b>Space</b> to jump — stay alive!</p>
+
+    <canvas id="game" width="420" height="220"></canvas>
+
+    <div class="stats">
+      <div>🏆 Best Score: <span id="best">0</span></div>
+      <div>⚡ Average Reaction: <span id="reaction">0</span> ms</div>
+    </div>
+
+    <div class="footer">Offline Mode — No Internet Required 🌐</div>
+
+    <script>
+      const canvas = document.getElementById("game");
+      const ctx = canvas.getContext("2d");
+      const bestScoreEl = document.getElementById("best");
+      const reactionEl = document.getElementById("reaction");
+
+      let gameStarted = false;
+      let dino = {
+        x: 50,
+        y: 170,
+        width: 35,
+        height: 40,
+        dy: 0,
+        gravity: 0.7,
+        jumpPower: -11,
+        grounded: true,
+      };
+      let obstacle = { x: 420, y: 180, width: 20, height: 35, speed: 6 };
+      let score = 0;
+      let bestScore = localStorage.getItem("bestScore") || 0;
+      let reactionTimes = JSON.parse(localStorage.getItem("reactionTimes") || "[]");
+      let gameOver = false;
+      let lastJumpTime = 0;
+
+      bestScoreEl.textContent = bestScore;
+
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") handleJump();
+      });
+
+      canvas.addEventListener("click", handleJump);
+      canvas.addEventListener("touchstart", handleJump);
+
+      function handleJump() {
+        if (!gameStarted) {
+          gameStarted = true;
+          resetGame();
+          loop();
+          return;
+        }
+
+        if (gameOver) {
+          resetGame();
+          return;
+        }
+
+        if (dino.grounded) {
+          const now = performance.now();
+          if (lastJumpTime) {
+            const reaction = Math.round(now - lastJumpTime);
+            reactionTimes.push(reaction);
+            if (reactionTimes.length > 10) reactionTimes.shift();
+            localStorage.setItem("reactionTimes", JSON.stringify(reactionTimes));
+            updateReactionStats();
+          }
+          lastJumpTime = now;
+          dino.dy = dino.jumpPower;
+          dino.grounded = false;
+        }
+      }
+
+      function updateReactionStats() {
+        if (reactionTimes.length === 0) return;
+        const avg = Math.round(
+          reactionTimes.reduce((a, b) => a + b, 0) / reactionTimes.length
+        );
+        reactionEl.textContent = avg;
+      }
+
+      function drawDino() {
+        ctx.fillStyle = "#2f3542";
+        ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+        ctx.fillStyle = "#57606f";
+        ctx.fillRect(dino.x + 25, dino.y - 15, 25, 25);
+        ctx.fillStyle = "#fff";
+        ctx.beginPath();
+        ctx.arc(dino.x + 42, dino.y - 5, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "#2f3542";
+        ctx.fillRect(dino.x + 5, dino.y + dino.height, 8, 10);
+        ctx.fillRect(dino.x + 22, dino.y + dino.height, 8, 10);
+      }
+
+      function drawObstacle() {
+        ctx.fillStyle = "#e74c3c";
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+      }
+
+      function resetGame() {
+        obstacle.x = 420;
+        score = 0;
+        gameOver = false;
+        dino.y = 170;
+        dino.dy = 0;
+        dino.grounded = true;
+        loop();
+      }
+
+      function drawStartScreen() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#333";
+        ctx.font = "20px Poppins";
+        ctx.fillText("🦖 Dino Runner", 130, 90);
+        ctx.font = "14px Poppins";
+        ctx.fillText("Tap or press SPACE to start", 120, 130);
+      }
+
+      function loop() {
+        if (gameOver) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#95a5a6";
+        ctx.fillRect(0, 200, canvas.width, 4);
+        drawDino();
+        drawObstacle();
+
+        dino.y += dino.dy;
+        if (dino.y + dino.height < 200) {
+          dino.dy += dino.gravity;
+        } else {
+          dino.dy = 0;
+          dino.grounded = true;
+          dino.y = 170;
+        }
+
+        obstacle.x -= obstacle.speed;
+        if (obstacle.x + obstacle.width < 0) {
+          obstacle.x = 420;
+          score++;
+          lastJumpTime = performance.now();
+        }
+
+        if (
+          dino.x < obstacle.x + obstacle.width &&
+          dino.x + dino.width > obstacle.x &&
+          dino.y < obstacle.y + obstacle.height &&
+          dino.y + dino.height > obstacle.y
+        ) {
+          gameOver = true;
+
+          if (score > bestScore) {
+            bestScore = score;
+            localStorage.setItem("bestScore", bestScore);
+            bestScoreEl.textContent = bestScore;
+          }
+
+          ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "#fff";
+          ctx.font = "20px Poppins";
+          ctx.fillText("💀 Game Over!", 135, 100);
+          ctx.fillText(`Score: ${score}`, 165, 130);
+          ctx.font = "14px Poppins";
+          ctx.fillText("Tap or press SPACE to restart", 100, 160);
+          return;
+        }
+
+        ctx.fillStyle = "#333";
+        ctx.font = "14px Poppins";
+        ctx.fillText("Score: " + score, 10, 20);
+
+        requestAnimationFrame(loop);
+      }
+
+      updateReactionStats();
+      drawStartScreen();
+    </script>
+  </body>
+</html>

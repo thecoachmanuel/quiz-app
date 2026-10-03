@@ -1,0 +1,732 @@
+/** @format - Admin Panel Styles for Quizix */
+
+/* Phosphor Icons & Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css");
+@import url("https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css");
+@import url("https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css");
+
+/* ===========================
+   ADMIN CSS DESIGN SYSTEM
+   Mirrors the PHP admin panel
+   =========================== */
+
+/* ---- Color Variables ---- */
+:root {
+  --admin-primary: #6366f1;
+  --admin-secondary: rgb(142 51 255);
+  --admin-info: rgb(0 184 217);
+  --admin-success: rgb(34 197 94);
+  --admin-warning: rgb(257 171 0);
+  --admin-error: rgb(255 86 48);
+  --admin-blue: #6366f1;
+
+  --admin-neutral-0: #ffffff;
+  --admin-neutral-10: #fafafb;
+  --admin-neutral-20: #f5f6f6;
+  --admin-neutral-30: #ebeced;
+  --admin-neutral-40: #dfe0e2;
+  --admin-neutral-50: #c2c4c8;
+  --admin-neutral-100: #7b8088;
+  --admin-neutral-200: #6d717b;
+  --admin-neutral-300: #5e636e;
+  --admin-neutral-400: #525763;
+  --admin-neutral-500: #434956;
+  --admin-neutral-600: #373d4b;
+  --admin-neutral-700: #262d3b;
+  --admin-neutral-800: #171f2e;
+  --admin-neutral-900: #0b1323;
+  --admin-neutral-903: #23262b;
+  --admin-neutral-904: #1d1e24;
+}
+
+/* ===========================
+   ADMIN LAYOUT
+   =========================== */
+
+.admin-wrapper {
+  font-family: "Inter", sans-serif;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 12;
+  height: 100%;
+  width: 280px;
+  background-color: var(--admin-neutral-0);
+  transition: transform 0.3s ease;
+}
+.dark .admin-sidebar {
+  background-color: var(--admin-neutral-904);
+}
+
+.admin-sidebar.opened {
+  transform: translateX(0);
+}
+.admin-sidebar.closed {
+  transform: translateX(-100%);
+}
+@media (min-width: 1200px) {
+  .admin-sidebar.opened {
+    transform: translateX(0);
+  }
+}
+
+/* Topbar */
+.admin-topbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: calc(100% - 280px);
+  z-index: 10;
+  background-color: var(--admin-neutral-0);
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--admin-neutral-30);
+  transition: width 0.3s ease, margin 0.3s ease;
+}
+.dark .admin-topbar {
+  background-color: var(--admin-neutral-904);
+  border-color: var(--admin-neutral-500);
+}
+.admin-topbar.sidebar-closed {
+  width: 100%;
+}
+@media (max-width: 1199px) {
+  .admin-topbar {
+    width: 100%;
+  }
+}
+
+/* Main content */
+.admin-main-content {
+  background-color: var(--admin-neutral-20);
+  min-height: 100vh;
+  padding-top: 66px;
+  margin-left: 280px;
+  width: calc(100% - 280px);
+  transition: margin 0.3s ease, width 0.3s ease;
+}
+.dark .admin-main-content {
+  background-color: var(--admin-neutral-903);
+  color: var(--admin-neutral-20);
+}
+.admin-main-content.sidebar-closed {
+  margin-left: 0;
+  width: 100%;
+}
+@media (max-width: 1199px) {
+  .admin-main-content {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+/* Sidebar overlay */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* ===========================
+   WHITE BOX
+   =========================== */
+.admin-white-box {
+  background-color: var(--admin-neutral-0);
+  border: 1px solid var(--admin-neutral-30);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.dark .admin-white-box {
+  background-color: var(--admin-neutral-904);
+  border-color: var(--admin-neutral-500);
+}
+@media (min-width: 768px) {
+  .admin-white-box {
+    padding: 1.25rem;
+  }
+}
+@media (min-width: 1400px) {
+  .admin-white-box {
+    padding: 1.5rem;
+  }
+}
+
+/* N10 Box */
+.admin-n10-box {
+  background-color: var(--admin-neutral-10);
+  border: 1px solid var(--admin-neutral-30);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+}
+.dark .admin-n10-box {
+  background-color: var(--admin-neutral-903);
+  border-color: var(--admin-neutral-600);
+}
+
+/* ===========================
+   TOPBAR BUTTON
+   =========================== */
+.admin-topbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  background-color: var(--admin-neutral-0);
+  border: 1px solid var(--admin-neutral-30);
+  border-radius: 9999px;
+  font-size: 1.25rem;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  color: var(--admin-neutral-700);
+  flex-shrink: 0;
+}
+.dark .admin-topbar-btn {
+  background-color: var(--admin-neutral-903);
+  border-color: var(--admin-neutral-500);
+  color: var(--admin-neutral-30);
+}
+.admin-topbar-btn:hover {
+  background-color: var(--admin-primary);
+  color: #fff;
+  border-color: var(--admin-primary);
+}
+
+/* ===========================
+   SIDEBAR NAV
+   =========================== */
+.admin-sidebar-header {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px dashed var(--admin-neutral-30);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.dark .admin-sidebar-header {
+  border-color: var(--admin-neutral-500);
+}
+
+.admin-sidebar-scroll {
+  overflow-y: auto;
+  height: calc(100% - 70px);
+  padding: 1rem 0.75rem 3rem;
+}
+.admin-sidebar-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-thumb {
+  background-color: rgba(99, 102, 241, 0.4);
+  border-radius: 4px;
+}
+
+/* Nav items */
+.admin-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: inherit;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  text-align: left;
+}
+.admin-nav-item:hover {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+.admin-nav-item:hover i,
+.admin-nav-item:hover svg {
+  color: #fff;
+}
+.admin-nav-item.active {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+.admin-nav-item.active i,
+.admin-nav-item.active svg {
+  color: #fff;
+}
+
+/* Submenu parent button */
+.admin-submenu-parent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  color: inherit;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+}
+.admin-submenu-parent:hover {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+.admin-submenu-parent.active {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+
+/* Submenu content */
+.admin-submenu-content {
+  margin-left: 1.25rem;
+  padding-left: 1.5rem;
+  padding-right: 0.75rem;
+  border-left: 1px solid rgba(99, 102, 241, 0.3);
+  margin-top: 0.25rem;
+}
+
+.admin-submenu-link {
+  display: flex;
+  align-items: center;
+  padding: 0.375rem 0.25rem;
+  font-size: 0.8125rem;
+  color: var(--admin-neutral-500);
+  border-radius: 0.25rem;
+  transition: color 0.15s;
+  cursor: pointer;
+}
+.dark .admin-submenu-link {
+  color: var(--admin-neutral-100);
+}
+.admin-submenu-link:hover,
+.admin-submenu-link.active {
+  color: var(--admin-primary);
+}
+
+/* Caret icon rotation */
+.admin-caret {
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.admin-caret.open {
+  transform: rotate(180deg);
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+.admin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+@media (min-width: 576px) {
+  .admin-btn {
+    padding: 0.5rem 1rem;
+  }
+}
+
+.admin-btn-primary {
+  background-color: var(--admin-primary);
+  border-color: var(--admin-primary);
+  color: #fff;
+}
+.admin-btn-primary:hover {
+  opacity: 0.9;
+}
+.admin-btn-primary.outlined {
+  background-color: transparent;
+  color: var(--admin-primary);
+  border-color: var(--admin-primary);
+}
+.admin-btn-primary.outlined:hover {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+
+.admin-btn-error {
+  background-color: var(--admin-error);
+  border-color: var(--admin-error);
+}
+.admin-btn-success {
+  background-color: var(--admin-success);
+  border-color: var(--admin-success);
+}
+.admin-btn-warning {
+  background-color: var(--admin-warning);
+  border-color: var(--admin-warning);
+  color: var(--admin-neutral-700);
+}
+
+/* ===========================
+   STATUS BADGES
+   =========================== */
+.admin-status {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.25rem 1rem;
+  font-size: 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid;
+}
+.admin-status.warning {
+  border-color: rgba(257, 171, 0, 0.5);
+  background-color: rgba(257, 171, 0, 0.1);
+  color: var(--admin-warning);
+}
+.admin-status.success {
+  border-color: rgba(34, 197, 94, 0.5);
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--admin-success);
+}
+.admin-status.error,
+.admin-status.danger {
+  border-color: rgba(255, 86, 48, 0.5);
+  background-color: rgba(255, 86, 48, 0.1);
+  color: var(--admin-error);
+}
+.admin-status.primary {
+  border-color: rgba(99, 102, 241, 0.5);
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--admin-primary);
+}
+.admin-status.n30 {
+  border-color: var(--admin-neutral-50);
+  background-color: var(--admin-neutral-30);
+}
+
+/* ===========================
+   FORM ELEMENTS
+   =========================== */
+.admin-text-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--admin-neutral-30);
+  border-radius: 0.5rem;
+  background-color: transparent;
+  font-size: 0.875rem;
+  color: var(--admin-neutral-700);
+  transition: border-color 0.2s;
+  outline: none;
+}
+.dark .admin-text-input {
+  border-color: var(--admin-neutral-500);
+  color: var(--admin-neutral-20);
+}
+.admin-text-input:focus {
+  border-color: var(--admin-primary);
+}
+.admin-text-input.input-error {
+  background-color: #fee2e2;
+  border-color: #dc2626;
+  color: #991b1b;
+}
+
+.admin-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.375rem;
+  color: var(--admin-neutral-700);
+}
+.dark .admin-label {
+  color: var(--admin-neutral-20);
+}
+
+/* ===========================
+   TABLE
+   =========================== */
+.admin-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.admin-table th {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--admin-neutral-500);
+  border-bottom: 1px solid var(--admin-neutral-30);
+  white-space: nowrap;
+}
+.dark .admin-table th {
+  border-color: var(--admin-neutral-500);
+  color: var(--admin-neutral-100);
+}
+.admin-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--admin-neutral-30);
+  color: var(--admin-neutral-700);
+  white-space: nowrap;
+}
+.dark .admin-table td {
+  border-color: var(--admin-neutral-600);
+  color: var(--admin-neutral-30);
+}
+.admin-table tr:hover td {
+  background-color: rgba(99, 102, 241, 0.03);
+}
+
+/* Pagination button */
+.admin-pagination-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 1px solid var(--admin-primary);
+  color: var(--admin-primary);
+  background-color: var(--admin-neutral-0);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.dark .admin-pagination-btn {
+  background-color: var(--admin-neutral-904);
+}
+.admin-pagination-btn:hover,
+.admin-pagination-btn.active {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+
+/* ===========================
+   SEARCH FORM
+   =========================== */
+.admin-search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(99, 102, 241, 0.05);
+  border: 1px solid var(--admin-neutral-30);
+  border-radius: 9999px;
+  padding: 0.25rem;
+  max-width: 280px;
+  width: 100%;
+  transition: border-color 0.2s;
+}
+.dark .admin-search-form {
+  border-color: var(--admin-neutral-500);
+}
+.admin-search-form:focus-within {
+  border-color: var(--admin-primary);
+}
+.admin-search-form input {
+  background: transparent;
+  font-size: 0.875rem;
+  outline: none;
+  padding: 0.25rem 0.75rem;
+  width: 100%;
+  color: var(--admin-neutral-700);
+}
+.dark .admin-search-form input {
+  color: var(--admin-neutral-20);
+}
+.admin-search-form button {
+  background-color: var(--admin-primary);
+  border-radius: 9999px;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ===========================
+   SWITCH TOGGLE
+   =========================== */
+.admin-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.admin-switch input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+.admin-switch-inner {
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  background-color: rgba(99, 102, 241, 0.2);
+  border-radius: 9999px;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+.admin-switch-inner::after {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  top: 0.25rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background-color: #fff;
+  transition: transform 0.3s;
+}
+.admin-switch input:checked ~ .admin-switch-inner {
+  background-color: var(--admin-primary);
+}
+.admin-switch input:checked ~ .admin-switch-inner::after {
+  transform: translateX(1.25rem);
+}
+
+/* ===========================
+   CUSTOM SCROLLBAR
+   =========================== */
+.admin-custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+  background-color: rgba(99, 102, 241, 0.1);
+}
+.admin-custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(99, 102, 241, 0.6);
+  border-radius: 4px;
+}
+
+/* ===========================
+   DROPDOWN
+   =========================== */
+.admin-dropdown {
+  position: relative;
+}
+.admin-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  z-index: 20;
+  background-color: var(--admin-neutral-0);
+  border: 1px solid var(--admin-neutral-30);
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 30px rgba(0, 0, 0, 0.08);
+  min-width: 200px;
+}
+.dark .admin-dropdown-menu {
+  background-color: var(--admin-neutral-904);
+  border-color: var(--admin-neutral-500);
+}
+
+/* ===========================
+   PAGE HEADER
+   =========================== */
+.admin-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ===========================
+   OVERVIEW GRID (stat cards)
+   =========================== */
+.admin-stat-card {
+  background-color: var(--admin-neutral-0);
+  border: 1px solid var(--admin-neutral-30);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.dark .admin-stat-card {
+  background-color: var(--admin-neutral-904);
+  border-color: var(--admin-neutral-500);
+}
+
+/* ===========================
+   TOAST NOTIFICATION
+   =========================== */
+.admin-toast-container {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ===========================
+   LOADING SPINNER
+   =========================== */
+.admin-spinner {
+  width: 3.25em;
+  transform-origin: center;
+  animation: adminRotate 2s linear infinite;
+}
+.admin-spinner circle {
+  fill: none;
+  stroke: var(--admin-primary);
+  stroke-width: 4;
+  stroke-dasharray: 1, 200;
+  stroke-dashoffset: 0;
+  stroke-linecap: round;
+  animation: adminDash 1.5s ease-in-out infinite;
+}
+
+@keyframes adminRotate {
+  100% { transform: rotate(360deg); }
+}
+@keyframes adminDash {
+  0% { stroke-dasharray: 1, 200; stroke-dashoffset: 0; }
+  50% { stroke-dasharray: 90, 200; stroke-dashoffset: -35px; }
+  100% { stroke-dashoffset: -125px; }
+}
+
+/* ===========================
+   MISC
+   =========================== */
+.admin-f-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.admin-section-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--admin-neutral-700);
+}
+.dark .admin-section-title {
+  color: var(--admin-neutral-20);
+}
+
+/* Tab active */
+.admin-tab.active {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+
+/* Input error text */
+.admin-input-error-text {
+  font-size: 0.75rem;
+  color: #dc2626;
+  margin-top: 0.25rem;
+  display: block;
+}
