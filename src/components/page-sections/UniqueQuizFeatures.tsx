@@ -48,7 +48,10 @@ export default function UniqueQuizFeatures({ slug }: { slug: string }) {
           />
         </div>
         <div className="col-span-12 flex flex-col justify-start gap-6 lg:col-span-6">
-          {getData("features", []).map((item: any, index: number) => (
+          {(Array.isArray(getData("features", []))
+            ? getData("features", [])
+            : []
+          ).map((item: any, index: number) => (
             <div
               className="relative flex items-center justify-start gap-6 overflow-hidden bg-slate-50/50 p-6 sm:p-8"
               key={index}

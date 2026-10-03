@@ -56,9 +56,11 @@ export default function TopPlayers({ slug }: Readonly<{ slug: string }>) {
           </Link>
         </div>
         <div className="stp-15 grid grid-cols-12 gap-6">
-          {topPlayers?.slice(0, 4).map((item: any, index: number) => (
-            <PlayerCard key={index} item={item} index={index} tran={tran} />
-          ))}
+          {(Array.isArray(topPlayers) ? topPlayers.slice(0, 4) : []).map(
+            (item: any, index: number) => (
+              <PlayerCard key={index} item={item} index={index} tran={tran} />
+            )
+          )}
         </div>
       </div>
     </section>

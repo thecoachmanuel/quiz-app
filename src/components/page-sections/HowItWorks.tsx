@@ -30,7 +30,10 @@ export default function HowItWorks({ slug }: { slug: string }) {
             </p>
           </div>
           <div className="stp-15 grid gap-6 md:grid-cols-3">
-            {getData("steps", []).map((item: any, index: number) => (
+            {(Array.isArray(getData("steps", []))
+              ? getData("steps", [])
+              : []
+            ).map((item: any, index: number) => (
               <div className="" key={`how-it-work-step-${index}`}>
                 <div className="relative flex items-center justify-center overflow-hidden py-3">
                   <div className="bg-primary/30 absolute -top-12 -left-12 size-[104px] rounded-full blur-[120px]"></div>

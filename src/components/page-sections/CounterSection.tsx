@@ -16,7 +16,10 @@ export default function CounterSection({ slug }: { slug: string }) {
   return (
     <section className="stp-30 sbp-30 relative overflow-hidden bg-slate-50">
       <div className="custom-container grid grid-cols-12 gap-6">
-        {getData("list", []).map((item: any, index: number) => (
+        {(Array.isArray(getData("list", []))
+          ? getData("list", [])
+          : []
+        ).map((item: any, index: number) => (
           <div
             key={index}
             className={`relative col-span-12 flex items-center justify-start gap-6 overflow-hidden rounded-md bg-slate-50/50 p-12 sm:col-span-6 xl:col-span-3`}

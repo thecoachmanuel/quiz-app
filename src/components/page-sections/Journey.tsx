@@ -51,7 +51,10 @@ export default function Journey({ slug }: { readonly slug: string }) {
           </div>
           <div className="pt-8">
             <div className="bg-primary flex items-center justify-start pt-1">
-              {getData("tab-data", []).map(
+              {(Array.isArray(getData("tab-data", []))
+                ? getData("tab-data", [])
+                : []
+              ).map(
                 (item: { title: string; content: string }, index: number) => (
                   <p
                     key={index}
@@ -68,11 +71,17 @@ export default function Journey({ slug }: { readonly slug: string }) {
               )}
             </div>
             <p className="text-light2 pt-6 text-lg">
-              {tran(getData("tab-data", [])[selectedTab]?.description)}
+              {Array.isArray(getData("tab-data", [])) &&
+              getData("tab-data", [])[selectedTab]
+                ? tran(getData("tab-data", [])[selectedTab]?.description)
+                : ""}
             </p>
             <div className="border-light4/30 my-8 border-b"></div>
             <div className="grid w-full grid-cols-2 gap-4">
-              {getData("features", []).map((item: string, index: number) => (
+              {(Array.isArray(getData("features", []))
+                ? getData("features", [])
+                : []
+              ).map((item: string, index: number) => (
                 <div
                   key={index}
                   className="flex items-center justify-start gap-3"

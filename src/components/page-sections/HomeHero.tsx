@@ -14,7 +14,18 @@ export default function HomeHero({ slug }: { slug: string }) {
   const { getData } = usePageComponent({ slug, sectionSlug: "home-hero" });
 
   const { tran } = useTranslations();
-  const typeWriterTextArray = getData("text-slider", "Math Quiz");
+  const typeWriterRaw = getData("text-slider", [
+    "Math Quiz",
+    "Science Quiz",
+    "History Quiz",
+    "Tech Quiz",
+  ]);
+  const typeWriterTextArray = Array.isArray(typeWriterRaw)
+    ? typeWriterRaw
+    : typeof typeWriterRaw === "string"
+    ? [typeWriterRaw]
+    : ["Math Quiz", "Science Quiz", "History Quiz", "Tech Quiz"];
+
   const translateTextArray = typeWriterTextArray.map((item: any) => {
     const translatedItem = tran(item);
     return translatedItem;
