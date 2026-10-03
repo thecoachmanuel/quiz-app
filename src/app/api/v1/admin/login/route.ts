@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import { UserModel } from "@/models/User";
+import { User, UserModel } from "@/models/User";
 
 export async function POST(request: Request) {
   try {
@@ -62,8 +62,14 @@ export async function POST(request: Request) {
     try {
       if (process.env.MONGODB_URI) {
         await connectToDatabase();
-        const dbUser = await UserModel.findOne({ email: inputEmail });
-        if (dbUser && dbUser.role === "admin" && dbUser.password === inputPassword) {
+        const dbUser = await User.findOne({ email: inputEmail });
+        const hasAdminRole =
+          dbUser &&
+          (dbUser.roles?.includes("admin") ||
+            dbUser.roles?.includes("Super Admin") ||
+            (dbUser as any).role === "admin");
+
+        if (dbUser && hasAdminRole && dbUser.password === inputPassword) {
           return NextResponse.json({
             ok: true,
             token: `admin_token_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,

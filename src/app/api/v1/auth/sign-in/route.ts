@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
-import { UserModel } from "@/models/User";
+import { User, UserModel } from "@/models/User";
 
 export async function POST(request: Request) {
   try {
@@ -28,8 +28,8 @@ export async function POST(request: Request) {
     try {
       if (process.env.MONGODB_URI) {
         await connectToDatabase();
-        const user = await UserModel.findOne({
-          $or: [{ email: loginId }, { username: loginId }],
+        const user = await User.findOne({
+          $or: [{ email: loginId }, { name: loginId }],
         });
 
         if (user && user.password === String(password)) {
