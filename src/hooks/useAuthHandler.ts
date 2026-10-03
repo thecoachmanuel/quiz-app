@@ -56,16 +56,24 @@ export const useAuthHandler = () => {
 
   const authConfig = useMemo(() => {
     return {
-      recaptcha: appInfo?.extensions?.recaptcha,
-      is_phone_enabled:
-        appInfo?.service_switch?.system_config?.phone_verification?.is_enabled,
-      is_email_enabled:
-        appInfo?.service_switch?.system_config?.email_verification?.is_enabled,
-      is_kyc_enabled:
-        appInfo?.service_switch?.system_config?.is_kyc_enabled?.is_enabled,
-      is_agreement_enabled:
+      recaptcha: appInfo?.extensions?.recaptcha || {
+        is_enabled: false,
+        site_key: "",
+        secret_key: "",
+      },
+      is_phone_enabled: Boolean(
+        appInfo?.service_switch?.system_config?.phone_verification?.is_enabled
+      ),
+      is_email_enabled: Boolean(
+        appInfo?.service_switch?.system_config?.email_verification?.is_enabled
+      ),
+      is_kyc_enabled: Boolean(
+        appInfo?.service_switch?.system_config?.is_kyc_enabled?.is_enabled
+      ),
+      is_agreement_enabled: Boolean(
         appInfo?.service_switch?.system_config?.agreement_trams_and_policy
-          ?.is_enabled,
+          ?.is_enabled
+      ),
     };
   }, [appInfo]);
 

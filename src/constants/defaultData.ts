@@ -314,8 +314,13 @@ export const DEFAULT_APP_INFO: AppInfoType = {
   service_switch: {
     system_config: {
       email_verification: { is_enabled: false },
+      phone_verification: { is_enabled: false },
       sms_verification: { is_enabled: false },
       two_factor_auth: { is_enabled: false },
+      is_kyc_enabled: { is_enabled: false },
+      force_secure_password: { is_enabled: false },
+      agreement_trams_and_policy: { is_enabled: false },
+      push_notification: { is_enabled: false },
     },
     site_pagination_config: { per_page: 10, data_limit: 10 },
     cookie_consent: { is_enabled: false, title: "", description: "" },

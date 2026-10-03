@@ -122,7 +122,7 @@ export default function SignUpForm({ countryCode }: Props) {
       });
       return;
     }
-    if (authConfig.recaptcha.is_enabled) {
+    if (authConfig?.recaptcha?.is_enabled) {
       if (!signUpForm.captcha_token) {
         toast.error(tran("Please verify you are not a robot"));
         return;

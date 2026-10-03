@@ -54,7 +54,7 @@ export default function SignInForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (authConfig.recaptcha.is_enabled) {
+    if (authConfig?.recaptcha?.is_enabled) {
       if (!credentials.captcha_token) {
         toast.error(tran("Please verify you are not a robot"));
         return;

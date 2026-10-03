@@ -105,8 +105,10 @@ export const PasswordInput: React.FC<PasswordInputProps> = ({
             {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
           </span>
         </div>
-        {appInfo?.service_switch?.system_config?.force_secure_password
-          .is_enabled && (
+        {Boolean(
+          appInfo?.service_switch?.system_config?.force_secure_password
+            ?.is_enabled
+        ) && (
           <AnimateHeight
             height={showRules && passedCount ? "auto" : 0}
             className=""

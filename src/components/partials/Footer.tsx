@@ -6,7 +6,7 @@ import { useMenu } from "@/providers/MenuProvider";
 import { useTranslations } from "@/providers/TranslationProviders";
 import { AppInfoType, SocialMediaItem } from "@/types";
 import { getPageUrl } from "@/utils/helper";
-import { ChatsIcon, MapPinIcon, PhoneCallIcon } from "@phosphor-icons/react";
+import { ChatsIcon, MapPinIcon, PhoneCallIcon } from "@phosphor-icons/react/dist/ssr";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -68,10 +68,17 @@ export default function Footer() {
                 {socialLinks.map((item: SocialMediaItem, index: number) => (
                   <Link
                     href={item?.link || "#"}
-                    className="bg-dark3 hover:bg-primary group flex size-10 cursor-pointer items-center justify-center rounded-full duration-300 hover:text-white sm:size-12"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-dark3 hover:bg-primary group flex size-10 cursor-pointer items-center justify-center rounded-full duration-300 hover:text-white sm:size-12 text-white"
                     key={index}
+                    aria-label={item?.name || "Social link"}
                   >
-                    <PhosphorIcon iconName={item?.icon} size={20} />
+                    <PhosphorIcon
+                      iconName={item?.icon || item?.name || "Globe"}
+                      size={20}
+                      weight="fill"
+                    />
                   </Link>
                 ))}
               </div>
