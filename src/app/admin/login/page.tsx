@@ -58,8 +58,10 @@ export default function AdminLoginPage() {
       setToken("demo_admin_jwt_token_quizix");
       setUser({
         id: 1,
+        full_name: "Master Administrator",
         name: "Master Administrator",
         email: email || "admin@quizapp.com",
+        roles: ["Super Admin"],
         role: "Super Admin",
       });
       toast.success("Logged in with Demo Administrator session!");
@@ -208,8 +210,10 @@ export default function AdminLoginPage() {
                   setToken("demo_admin_jwt_token_quizix");
                   setUser({
                     id: 1,
+                    full_name: "Master Administrator",
                     name: "Master Administrator",
                     email: "admin@quizapp.com",
+                    roles: ["Super Admin"],
                     role: "Super Admin",
                   });
                   toast.success("Logged in with Demo Administrator session!");

@@ -12,9 +12,11 @@ import { persist } from "zustand/middleware";
 export interface AdminUser {
   id: number;
   full_name: string;
+  name?: string;
   email: string;
   avatar?: string;
   roles?: string[];
+  role?: string;
 }
 
 interface AdminAuthState {
