@@ -3,7 +3,7 @@
 import { SERVER_URL } from "@/configs";
 
 export const ADMIN_TOKEN_NAME =
-  process.env.NEXT_PUBLIC_ADMIN_TOKEN_NAME || "admin_token_quizix";
+  process.env.NEXT_PUBLIC_ADMIN_TOKEN_NAME || "quiz_admin_token";
 
 export const ADMIN_API_BASE = SERVER_URL + "/api/v1/admin";
 

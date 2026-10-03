@@ -50,13 +50,16 @@ export default function AdminLoginPage() {
           flat[key] = (msgs as string[])[0];
         }
         setErrors(flat);
+      } else {
+        toast.error(data?.message || "Invalid credentials");
+      }
     } catch {
       // If backend API is not connected locally, allow demo login with standard credentials
       setToken("demo_admin_jwt_token_quizix");
       setUser({
         id: 1,
         name: "Master Administrator",
-        email: email || "admin@softivus.com",
+        email: email || "admin@quizapp.com",
         role: "Super Admin",
       });
       toast.success("Logged in with Demo Administrator session!");
@@ -206,7 +209,7 @@ export default function AdminLoginPage() {
                   setUser({
                     id: 1,
                     name: "Master Administrator",
-                    email: "admin@softivus.com",
+                    email: "admin@quizapp.com",
                     role: "Super Admin",
                   });
                   toast.success("Logged in with Demo Administrator session!");

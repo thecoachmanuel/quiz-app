@@ -98,12 +98,11 @@ const nextConfig: NextConfig = {
           },
           {
             key: "X-Frame-Options",
-            value: "ALLOWALL", // was DENY (must allow iframe for CodeCanyon)
+            value: "SAMEORIGIN",
           },
           {
             key: "Content-Security-Policy",
-            value:
-              "frame-ancestors 'self' https://codecanyon.net https://*.codecanyon.net https://*.envato.com;",
+            value: "frame-ancestors 'self';",
           },
           {
             key: "Referrer-Policy",

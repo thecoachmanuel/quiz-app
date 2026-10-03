@@ -1,16 +1,19 @@
 /** @format */
 
 export const SERVER_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://app.quiz.softivus.com";
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  process.env.NEXT_PUBLIC_BASE_URL ||
+  "http://localhost:3000";
 export const API_BASE_URL =
   SERVER_URL + (process.env.NEXT_PUBLIC_API_VERSION_PATH || "/api/v1");
 
 export const ASSETS_URL = process.env.NEXT_PUBLIC_ASSETS_URL || SERVER_URL;
 
-export const TOKEN_NAME = process.env.NEXT_PUBLIC_TOKEN_NAME || "token";
+export const TOKEN_NAME =
+  process.env.NEXT_PUBLIC_TOKEN_NAME || "quiz_auth_token";
 
 export const APP_BASE_URL =
-  process.env.NEXT_PUBLIC_BASE_URL || "https://quiz.softivus.com";
+  process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 
 export const ONBOARDING_POSITION = "ONBOARDING_POSITION";
 
