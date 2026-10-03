@@ -10,8 +10,10 @@ export interface IUser extends Document {
   avatar?: string;
   coins: number;
   balance: number;
+  score: number;
   status: "active" | "banned";
   roles: string[];
+  role?: string;
   is_kyc_verified: boolean;
   created_at: Date;
   updated_at: Date;
@@ -34,8 +36,10 @@ const UserSchema = new Schema<IUser>(
     avatar: { type: String, default: "" },
     coins: { type: Number, default: 100 },
     balance: { type: Number, default: 0 },
+    score: { type: Number, default: 0 },
     status: { type: String, enum: ["active", "banned"], default: "active" },
     roles: { type: [String], default: ["user"] },
+    role: { type: String, default: "user" },
     is_kyc_verified: { type: Boolean, default: false },
   },
   {
