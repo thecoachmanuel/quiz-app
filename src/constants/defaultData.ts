@@ -77,14 +77,28 @@ export const DEFAULT_PAGES: PageType[] = [
             "Packed with modern features for an incredible learning experience.",
           features: [
             {
+              image: "/quiz-feature-icon-1.png",
               title: "Interactive Quizzes",
               description:
                 "Engaging quiz formats with timers, leaderboards, and instant feedback.",
             },
             {
+              image: "/quiz-feature-icon-2.png",
               title: "Exciting Contests",
               description:
                 "Compete in live timed contests with cash prizes and global rankings.",
+            },
+            {
+              image: "/quiz-feature-icon-3.png",
+              title: "Adaptive Difficulty",
+              description:
+                "AI-driven questions matching your skill level as you advance.",
+            },
+            {
+              image: "/quiz-feature-icon-4.png",
+              title: "Real-Time Leaderboard",
+              description:
+                "Track your global rank, earn badges, and win coins every day.",
             },
           ],
         } as any,
@@ -247,9 +261,26 @@ export const DEFAULT_PAGES: PageType[] = [
 export const DEFAULT_APP_INFO: AppInfoType = {
   application_info: {
     site_name: "Quizix",
-    description: "AI Quiz & Trivia Gaming Platform",
+    description:
+      "AI Quiz & Trivia Gaming Platform. Challenge yourself, compete with friends, and win prizes.",
     email: "support@quizapp.com",
     contact_no: "+1 (800) 555-QUIZ",
+    company_info: {
+      name: "Quizix",
+      email: "support@quizapp.com",
+      phone: "+1 (800) 555-QUIZ",
+      website: "https://quiz-app-thecoachmanuel.vercel.app",
+      description:
+        "AI Quiz & Trivia Gaming Platform. Challenge yourself, compete with friends, and win prizes.",
+    },
+    address: {
+      country: "United States",
+      state: "California",
+      city: "San Francisco",
+      postal_code: "94105",
+      address: "100 Market Street",
+      location: "https://maps.google.com",
+    },
     theme: {
       primary_color: "#7C3AED",
       secondary_color: "#F59E0B",
@@ -259,15 +290,20 @@ export const DEFAULT_APP_INFO: AppInfoType = {
       logo_dark: "/logo.svg",
       favicon: "/favicon.ico",
     },
-    social_medias: [],
+    social_medias: [
+      { name: "Facebook", link: "https://facebook.com", icon: "FacebookLogo" },
+      { name: "Twitter", link: "https://twitter.com", icon: "TwitterLogo" },
+      { name: "Instagram", link: "https://instagram.com", icon: "InstagramLogo" },
+      { name: "LinkedIn", link: "https://linkedin.com", icon: "LinkedinLogo" },
+    ],
     locale: "en",
     coins: {
       initial_balance: 100,
       score_ratio: { coin: "1", score: 1 },
       usd_ratio: { coin: 10, usd: 1 },
     },
-    auth_left_sidebar_image: "",
-    footer_text: "© 2026 Quizix. All rights reserved.",
+    auth_left_sidebar_image: "/auth-illus.png",
+    footer_text: "All rights reserved.",
     referral: { joining: 50 },
   } as any,
   extensions: {
@@ -275,7 +311,15 @@ export const DEFAULT_APP_INFO: AppInfoType = {
     google_analytics: { is_enabled: false, measurement_id: "" },
     tawk_to: { is_enabled: false, property_id: "", widget_id: "" },
   },
-  service_switch: {} as any,
+  service_switch: {
+    system_config: {
+      email_verification: { is_enabled: false },
+      sms_verification: { is_enabled: false },
+      two_factor_auth: { is_enabled: false },
+    },
+    site_pagination_config: { per_page: 10, data_limit: 10 },
+    cookie_consent: { is_enabled: false, title: "", description: "" },
+  } as any,
   firebase: {} as any,
 };
 

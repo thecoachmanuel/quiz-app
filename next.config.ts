@@ -17,6 +17,9 @@ const DIRNAME: string = path.dirname(fileURLToPath(import.meta.url));
 const TRUSTED_IMAGE_DOMAINS: string[] = [
   ASSETS_URL,
   "https://eu.ui-avatars.com/",
+  "https://ui-avatars.com/",
+  "https://images.unsplash.com/",
+  "https://via.placeholder.com/",
 ];
 
 // Configuration builders

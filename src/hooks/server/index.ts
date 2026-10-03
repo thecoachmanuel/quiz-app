@@ -16,7 +16,24 @@ export const getAppInfo = async () => {
       url: value.url,
       cacheKey: value.cacheKey,
     })) as any;
-    if (response?.data) return response.data as AppInfoType;
+    if (response?.data) {
+      return {
+        ...DEFAULT_APP_INFO,
+        ...response.data,
+        application_info: {
+          ...DEFAULT_APP_INFO.application_info,
+          ...(response.data.application_info || {}),
+          company_info: {
+            ...DEFAULT_APP_INFO.application_info.company_info,
+            ...(response.data.application_info?.company_info || {}),
+          },
+          logo_favicon: {
+            ...DEFAULT_APP_INFO.application_info.logo_favicon,
+            ...(response.data.application_info?.logo_favicon || {}),
+          },
+        },
+      } as AppInfoType;
+    }
   } catch (error: any) {
     console.warn("[getAppInfo] Backend unavailable, using default app info.");
   }

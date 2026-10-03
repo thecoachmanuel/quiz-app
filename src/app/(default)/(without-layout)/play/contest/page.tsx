@@ -89,14 +89,19 @@ export default function PlayContest() {
         <div className="bg-primary/5 border-dark5 flex w-full max-w-[1350px] flex-col items-center justify-center overflow-auto rounded-xl border p-6">
           <div className="cursor-disabled flex items-center justify-center gap-2">
             <ImageLoader
-              src={appInfo?.application_info?.logo_favicon?.logo_dark || logo}
-              alt={appInfo?.application_info?.company_info?.name}
-              className="max-sm:size-7"
+              src={
+                appInfo?.application_info?.logo_favicon?.logo_dark ||
+                appInfo?.application_info?.logo_favicon?.logo_light ||
+                logo
+              }
+              alt={appInfo?.application_info?.company_info?.name || "Quizix"}
+              className="max-sm:size-7 size-10 object-contain"
               width={40}
               height={40}
+              priority
             />
-            <span className="heading-3">
-              {appInfo?.application_info?.company_info?.name}
+            <span className="heading-3 font-bold">
+              {appInfo?.application_info?.company_info?.name || "Quizix"}
             </span>
           </div>
           <div className="flex w-full items-center justify-center gap-3 max-md:flex-col lg:gap-6 lg:px-20">

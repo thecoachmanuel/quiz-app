@@ -9,20 +9,32 @@ import ImageLoader from "./ImageLoader";
 export default function Logo({ link = "/" }: { link?: string }) {
   const { appInfo }: { appInfo: AppInfoType } = useAuthStore((state) => state);
 
+  const companyName =
+    appInfo?.application_info?.company_info?.name ||
+    appInfo?.application_info?.site_name ||
+    "Quizix";
+
+  const logoSrc =
+    appInfo?.application_info?.logo_favicon?.logo_dark ||
+    appInfo?.application_info?.logo_favicon?.logo_light ||
+    logo ||
+    "/logo.svg";
+
   return (
     <Link
       href={link}
-      className="flex items-center justify-start gap-0.5 sm:gap-2"
+      className="flex items-center justify-start gap-2 hover:opacity-95 transition-opacity"
     >
       <ImageLoader
-        src={appInfo?.application_info?.logo_favicon?.logo_dark || logo}
-        alt={appInfo?.application_info?.company_info?.name}
-        className="max-sm:size-7"
+        src={logoSrc}
+        alt={companyName}
+        className="max-sm:size-8 size-10 object-contain shrink-0"
         width={40}
         height={40}
+        priority
       />
-      <span className="heading-3">
-        {appInfo?.application_info?.company_info?.name}
+      <span className="heading-3 font-bold tracking-tight">
+        {companyName}
       </span>
     </Link>
   );

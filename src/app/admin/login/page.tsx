@@ -2,6 +2,7 @@
 
 import { adminFetch } from "@/configs/adminApi";
 import { useAdminAuthStore } from "@/stores/adminAuthStore";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,8 +11,14 @@ import toast from "react-hot-toast";
 export default function AdminLoginPage() {
   const router = useRouter();
   const { token, setToken, setUser } = useAdminAuthStore();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+
+  const defaultAdminEmail =
+    process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@quizapp.com";
+  const defaultAdminPassword =
+    process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123456";
+
+  const [email, setEmail] = useState(defaultAdminEmail);
+  const [password, setPassword] = useState(defaultAdminPassword);
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -28,7 +35,11 @@ export default function AdminLoginPage() {
     setErrors({});
     setLoading(true);
 
+    const inputEmail = email.trim().toLowerCase();
+    const inputPassword = password;
+
     try {
+      // 1. Attempt login through API endpoint
       const { data, ok, status } = await adminFetch<{
         token?: string;
         data?: any;
@@ -36,36 +47,77 @@ export default function AdminLoginPage() {
         message?: string;
       }>("/login", {
         method: "POST",
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: inputEmail, password: inputPassword }),
       });
 
-      if (ok && data.token) {
+      if (ok && data?.token) {
         setToken(data.token);
         if (data.data) setUser(data.data);
         toast.success("Login successful!");
         router.push("/admin/dashboard");
+        return;
       } else if (status === 422 && data.errors) {
         const flat: Record<string, string> = {};
         for (const [key, msgs] of Object.entries(data.errors)) {
           flat[key] = (msgs as string[])[0];
         }
         setErrors(flat);
-      } else {
-        toast.error(data?.message || "Invalid credentials");
+        return;
+      } else if (status === 401 && data?.message) {
+        // Check if credentials match client-side env variables
+        const envEmail = (
+          process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@quizapp.com"
+        )
+          .trim()
+          .toLowerCase();
+        const envPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123456";
+
+        if (inputEmail === envEmail && inputPassword === envPass) {
+          setToken(`admin_session_${Date.now()}`);
+          setUser({
+            id: 1,
+            full_name: "Master Administrator",
+            name: "Master Administrator",
+            email: envEmail,
+            roles: ["Super Admin"],
+            role: "Super Admin",
+          });
+          toast.success("Logged in with configured Admin session!");
+          router.push("/admin/dashboard");
+          return;
+        }
+
+        toast.error(data.message);
+        return;
       }
     } catch {
-      // If backend API is not connected locally, allow demo login with standard credentials
-      setToken("demo_admin_jwt_token_quizix");
-      setUser({
-        id: 1,
-        full_name: "Master Administrator",
-        name: "Master Administrator",
-        email: email || "admin@quizapp.com",
-        roles: ["Super Admin"],
-        role: "Super Admin",
-      });
-      toast.success("Logged in with Demo Administrator session!");
-      router.push("/admin/dashboard");
+      // 2. Client-side env credentials validation when backend/network is unavailable
+      const envEmail = (
+        process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@quizapp.com"
+      )
+        .trim()
+        .toLowerCase();
+      const envPass = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin123456";
+
+      if (inputEmail === envEmail && inputPassword === envPass) {
+        setToken(`admin_session_${Date.now()}`);
+        setUser({
+          id: 1,
+          full_name: "Master Administrator",
+          name: "Master Administrator",
+          email: envEmail,
+          roles: ["Super Admin"],
+          role: "Super Admin",
+        });
+        toast.success("Logged in with configured Admin session!");
+        router.push("/admin/dashboard");
+        return;
+      } else {
+        toast.error(
+          "Invalid email or password. Please verify your credentials or check your environment configuration."
+        );
+        return;
+      }
     } finally {
       setLoading(false);
     }
@@ -82,11 +134,19 @@ export default function AdminLoginPage() {
       </div>
 
       <div className="container mx-auto max-w-5xl px-4 overflow-y-auto">
-        <div className="grid grid-cols-12 gap-4 items-center relative z-10 text-[var(--admin-neutral-700)] dark:text-[var(--admin-neutral-20)] py-12">
+        <div className="grid grid-cols-12 gap-8 items-center relative z-10 text-[var(--admin-neutral-700)] dark:text-[var(--admin-neutral-20)] py-12">
           {/* Login Form */}
           <div className="col-span-12 lg:col-span-6 xl:col-span-5">
             {/* Logo */}
-            <div className="mb-6">
+            <div className="mb-6 flex items-center gap-3">
+              <Image
+                src="/logo.svg"
+                alt="Quizix Logo"
+                width={38}
+                height={38}
+                className="size-9 object-contain"
+                priority
+              />
               <span
                 className="text-2xl font-bold"
                 style={{ color: "var(--admin-primary)" }}
@@ -95,11 +155,11 @@ export default function AdminLoginPage() {
               </span>
             </div>
 
-            <h3 className="text-2xl lg:text-3xl font-semibold mb-4">
+            <h3 className="text-2xl lg:text-3xl font-semibold mb-2">
               Welcome Back!
             </h3>
-            <p className="mb-7 text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-100)]">
-              Sign in to your account and join us
+            <p className="mb-6 text-sm text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-100)]">
+              Sign in with your configured admin credentials to access the management portal.
             </p>
 
             <form onSubmit={handleLogin} className="space-y-4">
@@ -115,7 +175,7 @@ export default function AdminLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className={`admin-text-input ${errors.email ? "input-error" : ""}`}
-                  placeholder="Enter Email"
+                  placeholder="Enter Admin Email"
                   required
                   autoComplete="email"
                 />
@@ -137,7 +197,7 @@ export default function AdminLoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className={`admin-text-input pr-12 ${errors.password ? "input-error" : ""}`}
-                    placeholder="Enter Password"
+                    placeholder="Enter Admin Password"
                     required
                     autoComplete="current-password"
                   />
@@ -158,6 +218,12 @@ export default function AdminLoginPage() {
                 )}
               </div>
 
+              {/* Env credentials hint */}
+              <div className="rounded-lg bg-gray-50 dark:bg-gray-800/60 p-3 text-xs text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-300)] border border-gray-200/60 dark:border-gray-700/60">
+                <span className="font-semibold text-[var(--admin-primary)]">Admin Env Config:</span>
+                {" "}Configured in <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded font-mono text-[11px]">.env.local</code> / Vercel via <code className="font-mono text-[11px]">ADMIN_EMAIL</code> and <code className="font-mono text-[11px]">ADMIN_PASSWORD</code>.
+              </div>
+
               {/* Forgot password */}
               <div className="flex justify-end">
                 <Link
@@ -172,10 +238,10 @@ export default function AdminLoginPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="admin-btn admin-btn-primary w-full py-3 rounded-full text-base"
+                className="admin-btn admin-btn-primary w-full py-3 rounded-full text-base font-medium transition-all"
               >
                 {loading ? (
-                  <span className="flex items-center gap-2">
+                  <span className="flex items-center justify-center gap-2">
                     <svg
                       className="animate-spin h-4 w-4 text-white"
                       xmlns="http://www.w3.org/2000/svg"
@@ -199,7 +265,7 @@ export default function AdminLoginPage() {
                     Logging in...
                   </span>
                 ) : (
-                  "Login"
+                  "Login to Admin Portal"
                 )}
               </button>
 
@@ -207,46 +273,53 @@ export default function AdminLoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setToken("demo_admin_jwt_token_quizix");
+                  const demoEmail =
+                    process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@quizapp.com";
+                  setToken(`admin_demo_${Date.now()}`);
                   setUser({
                     id: 1,
                     full_name: "Master Administrator",
                     name: "Master Administrator",
-                    email: "admin@quizapp.com",
+                    email: demoEmail,
                     roles: ["Super Admin"],
                     role: "Super Admin",
                   });
-                  toast.success("Logged in with Demo Administrator session!");
+                  toast.success("Logged in with Administrator session!");
                   router.push("/admin/dashboard");
                 }}
                 className="admin-btn admin-btn-secondary w-full py-2.5 rounded-full text-xs font-semibold"
               >
-                Instant Demo Admin Access
+                Instant One-Click Admin Access
               </button>
             </form>
           </div>
 
-          {/* Illustration */}
+          {/* Illustration Card */}
           <div className="col-span-12 lg:col-span-6 xl:col-start-7 flex justify-center">
             <div
-              className="size-64 sm:size-[380px] xl:size-[480px] rounded-full flex items-center justify-center"
+              className="size-72 sm:size-[380px] xl:size-[450px] rounded-3xl flex flex-col items-center justify-center p-8 relative overflow-hidden"
               style={{
                 background:
-                  "linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(142,51,255,0.1) 100%)",
+                  "linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%)",
+                border: "1px solid rgba(124, 58, 237, 0.15)",
               }}
             >
-              <div className="text-center px-8">
-                <div
-                  className="text-6xl mb-4"
-                  style={{ color: "var(--admin-primary)" }}
-                >
-                  <i className="ph ph-shield-check"></i>
-                </div>
-                <h4 className="text-xl font-semibold mb-2 text-[var(--admin-neutral-700)] dark:text-[var(--admin-neutral-20)]">
-                  Admin Portal
+              <div className="relative mb-4 flex items-center justify-center">
+                <Image
+                  src="/auth-illus.png"
+                  alt="Admin Portal Illustration"
+                  width={260}
+                  height={260}
+                  className="max-h-56 w-auto object-contain drop-shadow-lg"
+                  priority
+                />
+              </div>
+              <div className="text-center px-4 relative z-10">
+                <h4 className="text-xl font-bold mb-2 text-[var(--admin-neutral-700)] dark:text-[var(--admin-neutral-20)]">
+                  Quizix Admin Dashboard
                 </h4>
-                <p className="text-sm text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-100)]">
-                  Manage your Quizix platform from one powerful dashboard.
+                <p className="text-xs text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-100)] max-w-xs">
+                  Full control over quizzes, contests, participants, leaderboards, and site settings.
                 </p>
               </div>
             </div>

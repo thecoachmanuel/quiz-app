@@ -8,6 +8,7 @@ import {
   privateInstance,
   updatePrivateAxiosInstance,
 } from "@/configs/axiosConfig";
+import { DEFAULT_APP_INFO } from "@/constants/defaultData";
 import { UserType } from "@/types/user";
 import Cookies from "js-cookie";
 import { createStore } from "zustand/vanilla";
@@ -32,7 +33,7 @@ export const defaultInitState: AuthState = {
   isAuthenticated: false,
   token: "",
   user: undefined,
-  appInfo: null,
+  appInfo: DEFAULT_APP_INFO,
 };
 
 export const createAuthStore = (initState: AuthState = defaultInitState) => {

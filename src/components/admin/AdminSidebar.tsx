@@ -194,9 +194,17 @@ export default function AdminSidebar({
     >
       {/* Header */}
       <div className="admin-sidebar-header">
-        <Link href="/admin/dashboard" className="flex items-center gap-2">
+        <Link href="/admin/dashboard" className="flex items-center gap-2.5">
+          <Image
+            src="/logo.svg"
+            alt="Quizix"
+            width={32}
+            height={32}
+            className="size-8 object-contain shrink-0"
+            priority
+          />
           <span
-            className="text-lg font-bold"
+            className="text-lg font-bold tracking-tight"
             style={{ color: "var(--admin-primary)" }}
           >
             Quizix Admin
