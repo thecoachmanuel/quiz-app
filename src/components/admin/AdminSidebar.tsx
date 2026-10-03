@@ -195,23 +195,19 @@ export default function AdminSidebar({
       {/* Header */}
       <div className="admin-sidebar-header">
         <Link href="/admin/dashboard" className="flex items-center gap-2.5">
-          <Image
-            src="/logo.svg"
+          <img
+            src={logoLight}
             alt="Quizix"
-            width={32}
-            height={32}
-            className="size-8 object-contain shrink-0"
-            priority
+            className="h-9 w-auto max-h-9 object-contain dark:hidden block application-logo"
           />
-          <span
-            className="text-lg font-bold tracking-tight"
-            style={{ color: "var(--admin-primary)" }}
-          >
-            Quizix Admin
-          </span>
+          <img
+            src={logoDark}
+            alt="Quizix"
+            className="h-9 w-auto max-h-9 object-contain hidden dark:block application-logo"
+          />
         </Link>
         <button
-          className="xl:hidden text-xl p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="xl:hidden text-xl p-1 rounded-lg hover:bg-neutral-40 dark:hover:bg-neutral-700"
           onClick={onClose}
           aria-label="Close sidebar"
         >

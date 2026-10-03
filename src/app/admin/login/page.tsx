@@ -2,7 +2,6 @@
 
 import { adminFetch } from "@/configs/adminApi";
 import { useAdminAuthStore } from "@/stores/adminAuthStore";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,6 +21,34 @@ export default function AdminLoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isDark, setIsDark] = useState(false);
+
+  // Initialize theme on mount
+  useEffect(() => {
+    const isDarkStored = localStorage.getItem("theme") === "dark";
+    setIsDark(isDarkStored);
+    if (isDarkStored) {
+      document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
+    }
+  }, []);
+
+  const toggleDark = () => {
+    const newDark = !isDark;
+    setIsDark(newDark);
+    if (newDark) {
+      document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
+      localStorage.setItem("theme", "light");
+    }
+  };
 
   // Redirect if already authenticated
   useEffect(() => {
@@ -124,46 +151,55 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-x-hidden flex items-center justify-center bg-[var(--admin-neutral-0)] dark:bg-[var(--admin-neutral-904)]">
-      {/* Background blobs */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-8 -left-8 lg:-top-32 lg:-left-40 size-40 lg:size-[340px] rounded-full bg-[var(--admin-secondary)] opacity-20 blur-[100px]" />
-        <div className="absolute -top-8 -right-8 lg:-top-32 lg:-right-40 size-40 lg:size-[340px] rounded-full bg-[var(--admin-error)] opacity-20 blur-[100px]" />
-        <div className="absolute -right-8 -bottom-8 lg:-right-40 lg:-bottom-28 size-40 lg:size-[340px] rounded-full bg-[var(--admin-info)] opacity-15 blur-[100px]" />
-        <div className="absolute -left-8 -bottom-8 lg:-left-40 lg:-bottom-28 size-40 lg:size-[340px] rounded-full bg-[var(--admin-warning)] opacity-15 blur-[100px]" />
+    <main className="relative min-h-screen overflow-x-hidden f-center bg-neutral-0 dark:bg-neutral-904 text-neutral-700 dark:text-neutral-20">
+      {/* Dark / Light Mode Switcher in top right */}
+      <div className="absolute top-4 right-4 z-20">
+        <button
+          type="button"
+          onClick={toggleDark}
+          className="topbar-btn cursor-pointer"
+          title="Toggle Theme"
+        >
+          <i className={`ph ${isDark ? "ph-sun" : "ph-moon"} text-xl`}></i>
+        </button>
       </div>
 
-      <div className="container mx-auto max-w-5xl px-4 overflow-y-auto">
-        <div className="grid grid-cols-12 gap-8 items-center relative z-10 text-[var(--admin-neutral-700)] dark:text-[var(--admin-neutral-20)] py-12">
-          {/* Login Form */}
-          <div className="col-span-12 lg:col-span-6 xl:col-span-5">
+      {/* Ambient background glow spheres (matching reference) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-8 -left-8 lg:-top-32 lg:-left-40 size-40 lg:size-[340px] rounded-full bg-secondary-300 opacity-[0.2] blur-[100px]" />
+        <div className="absolute -top-8 -right-8 lg:-top-32 lg:-right-40 size-40 lg:size-[340px] rounded-full bg-error-300 opacity-[0.2] blur-[100px]" />
+        <div className="absolute -right-8 -bottom-8 lg:-right-40 lg:-bottom-28 size-40 lg:size-[340px] rounded-full bg-info-300 opacity-[0.15] blur-[100px]" />
+        <div className="absolute -left-8 -bottom-8 lg:-left-40 lg:-bottom-28 size-40 lg:size-[340px] rounded-full bg-warning-300 opacity-[0.15] blur-[100px]" />
+      </div>
+
+      <div className="container mx-auto px-4 max-w-6xl overflow-y-auto">
+        <div className="grid grid-cols-12 gap-6 xxl:gap-8 items-center relative z-[4] py-12">
+          {/* Left Column: Form */}
+          <div className="col-span-12 lg:col-span-6 xxl:col-span-5">
             {/* Logo */}
-            <div className="mb-6 flex items-center gap-3">
-              <Image
-                src="/logo.svg"
-                alt="Quizix Logo"
-                width={38}
-                height={38}
-                className="size-9 object-contain"
-                priority
-              />
-              <span
-                className="text-2xl font-bold"
-                style={{ color: "var(--admin-primary)" }}
-              >
-                Quizix Admin
-              </span>
+            <div className="mb-6 xl:mb-8">
+              <Link href="/" className="inline-block">
+                <img
+                  src="/assets/admin/images/logo-light.png"
+                  alt="Quizix"
+                  className="h-9 w-auto max-h-9 object-contain dark:hidden block"
+                />
+                <img
+                  src="/assets/admin/images/logo-dark.png"
+                  alt="Quizix"
+                  className="h-9 w-auto max-h-9 object-contain hidden dark:block"
+                />
+              </Link>
             </div>
 
-            <h3 className="text-2xl lg:text-3xl font-semibold mb-2">
+            <h3 className="text-2xl sm:text-3xl font-semibold mb-2 xl:mb-4 text-neutral-700 dark:text-neutral-20">
               Welcome Back!
             </h3>
-            <p className="mb-6 text-sm text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-100)]">
-              Sign in with your configured admin credentials to access the management portal.
+            <p className="text-sm text-neutral-500 dark:text-neutral-30 mb-7 xl:mb-10">
+              Sign in to your account and join us
             </p>
 
             <form onSubmit={handleLogin} className="space-y-4">
-              {/* Email */}
               <div>
                 <label htmlFor="email" className="admin-label">
                   Email
@@ -174,154 +210,102 @@ export default function AdminLoginPage() {
                   name="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`admin-text-input ${errors.email ? "input-error" : ""}`}
-                  placeholder="Enter Admin Email"
+                  className={`text-input ${errors.email ? "input-error" : ""}`}
+                  placeholder="Enter Email"
                   required
                   autoComplete="email"
                 />
                 {errors.email && (
-                  <span className="admin-input-error-text">{errors.email}</span>
+                  <span className="input-text-error">{errors.email}</span>
                 )}
               </div>
 
-              {/* Password */}
               <div>
-                <label htmlFor="password" className="admin-label">
+                <label htmlFor="pass2" className="admin-label">
                   Password
                 </label>
-                <div className="relative">
+                <div id="password-field" className="rounded-3xl relative">
                   <input
-                    id="password"
+                    id="pass2"
                     name="password"
                     type={showPass ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`admin-text-input pr-12 ${errors.password ? "input-error" : ""}`}
-                    placeholder="Enter Admin Password"
+                    className={`text-input pr-12 ${errors.password ? "input-error" : ""}`}
+                    placeholder="Enter Password"
                     required
                     autoComplete="current-password"
                   />
-                  <button
-                    type="button"
+                  <span
                     onClick={() => setShowPass(!showPass)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 flex size-8 cursor-pointer items-center justify-center rounded-full duration-300 hover:bg-[var(--admin-neutral-40)] dark:hover:bg-[var(--admin-neutral-700)]"
+                    className="toggle-password absolute right-4 top-1/2 -translate-y-1/2 flex size-8 cursor-pointer items-center justify-center rounded-full duration-300 hover:bg-neutral-40 dark:hover:bg-neutral-700"
                   >
                     <i
                       className={`ph ${showPass ? "ph-eye-slash" : "ph-eye"} text-xl`}
                     ></i>
-                  </button>
+                  </span>
                 </div>
                 {errors.password && (
-                  <span className="admin-input-error-text">
-                    {errors.password}
-                  </span>
+                  <span className="input-text-error">{errors.password}</span>
                 )}
               </div>
 
-              {/* Env credentials hint */}
-              <div className="rounded-lg bg-gray-50 dark:bg-gray-800/60 p-3 text-xs text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-300)] border border-gray-200/60 dark:border-gray-700/60">
-                <span className="font-semibold text-[var(--admin-primary)]">Admin Env Config:</span>
-                {" "}Configured in <code className="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded font-mono text-[11px]">.env.local</code> / Vercel via <code className="font-mono text-[11px]">ADMIN_EMAIL</code> and <code className="font-mono text-[11px]">ADMIN_PASSWORD</code>.
-              </div>
-
-              {/* Forgot password */}
-              <div className="flex justify-end">
+              <div className="flex justify-end mt-2 mb-5">
                 <Link
                   href="/admin/forgot-password"
-                  className="text-sm text-[var(--admin-secondary)] hover:underline"
+                  className="text-sm text-secondary-300 hover:underline"
                 >
                   Forgot Password?
                 </Link>
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
-                className="admin-btn admin-btn-primary w-full py-3 rounded-full text-base font-medium transition-all"
+                className="btn-primary w-full py-3 text-sm font-semibold"
               >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg
-                      className="animate-spin h-4 w-4 text-white"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                      ></path>
-                    </svg>
-                    Logging in...
-                  </span>
-                ) : (
-                  "Login to Admin Portal"
-                )}
+                {loading ? "Logging in..." : "Login"}
               </button>
 
-              {/* Instant Demo Access Button */}
-              <button
-                type="button"
-                onClick={() => {
-                  const demoEmail =
-                    process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@quizapp.com";
-                  setToken(`admin_demo_${Date.now()}`);
-                  setUser({
-                    id: 1,
-                    full_name: "Master Administrator",
-                    name: "Master Administrator",
-                    email: demoEmail,
-                    roles: ["Super Admin"],
-                    role: "Super Admin",
-                  });
-                  toast.success("Logged in with Administrator session!");
-                  router.push("/admin/dashboard");
-                }}
-                className="admin-btn admin-btn-secondary w-full py-2.5 rounded-full text-xs font-semibold"
-              >
-                Instant One-Click Admin Access
-              </button>
+              {/* Quick access & Env credentials reminder */}
+              <div className="pt-2 flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const demoEmail =
+                      process.env.NEXT_PUBLIC_ADMIN_EMAIL || "admin@quizapp.com";
+                    setToken(`admin_session_${Date.now()}`);
+                    setUser({
+                      id: 1,
+                      full_name: "Master Administrator",
+                      name: "Master Administrator",
+                      email: demoEmail,
+                      roles: ["Super Admin"],
+                      role: "Super Admin",
+                    });
+                    toast.success("Logged in with Administrator session!");
+                    router.push("/admin/dashboard");
+                  }}
+                  className="btn-primary outlined w-full py-2 text-xs"
+                >
+                  Instant Admin Access
+                </button>
+
+                <p className="text-[11px] text-center text-neutral-400 dark:text-neutral-500">
+                  Credentials configured in <code className="px-1 py-0.5 rounded bg-neutral-30 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">ADMIN_EMAIL</code> & <code className="px-1 py-0.5 rounded bg-neutral-30 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300">ADMIN_PASSWORD</code>
+                </p>
+              </div>
             </form>
           </div>
 
-          {/* Illustration Card */}
-          <div className="col-span-12 lg:col-span-6 xl:col-start-7 flex justify-center">
-            <div
-              className="size-72 sm:size-[380px] xl:size-[450px] rounded-3xl flex flex-col items-center justify-center p-8 relative overflow-hidden"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(245, 158, 11, 0.08) 100%)",
-                border: "1px solid rgba(124, 58, 237, 0.15)",
-              }}
-            >
-              <div className="relative mb-4 flex items-center justify-center">
-                <Image
-                  src="/auth-illus.png"
-                  alt="Admin Portal Illustration"
-                  width={260}
-                  height={260}
-                  className="max-h-56 w-auto object-contain drop-shadow-lg"
-                  priority
-                />
-              </div>
-              <div className="text-center px-4 relative z-10">
-                <h4 className="text-xl font-bold mb-2 text-[var(--admin-neutral-700)] dark:text-[var(--admin-neutral-20)]">
-                  Quizix Admin Dashboard
-                </h4>
-                <p className="text-xs text-[var(--admin-neutral-500)] dark:text-[var(--admin-neutral-100)] max-w-xs">
-                  Full control over quizzes, contests, participants, leaderboards, and site settings.
-                </p>
-              </div>
+          {/* Right Column: Reference Circle Image */}
+          <div className="col-span-12 lg:col-span-6 xxl:col-start-7 flex justify-center">
+            <div className="size-72 sm:size-[450px] xxl:size-[580px] rounded-full bg-neutral-30 dark:bg-neutral-700 f-center overflow-hidden p-6 sm:p-10 shadow-lg">
+              <img
+                src="/assets/admin/images/login-1.png"
+                alt="Quizix Admin"
+                className="max-h-full max-w-full object-contain drop-shadow-md select-none pointer-events-none"
+              />
             </div>
           </div>
         </div>

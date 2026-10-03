@@ -65,22 +65,32 @@ export default function AdminLayoutWrapper({
     }
   }, [pathname]);
 
-  // Open sidebar on large screens by default
+  // Open sidebar on large screens by default and sync theme
   useEffect(() => {
     if (typeof window !== "undefined" && window.innerWidth >= 1200) {
       setSidebarOpen(true);
     }
+    try {
+      const isDark = localStorage.getItem("theme") === "dark";
+      if (isDark) {
+        document.documentElement.classList.add("dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        document.documentElement.setAttribute("data-theme", "light");
+      }
+    } catch {}
   }, []);
 
   // Loading state
   if (isCheckingAuth && !isPublicRoute) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[var(--admin-neutral-0)] dark:bg-[var(--admin-neutral-904)]">
+      <div className="fixed inset-0 flex items-center justify-center bg-neutral-0 dark:bg-neutral-904">
         <div className="flex flex-col items-center gap-4">
           <svg className="admin-spinner" viewBox="25 25 50 50">
             <circle cx="50" cy="50" r="20"></circle>
           </svg>
-          <span className="text-sm text-[var(--admin-neutral-500)]">
+          <span className="text-sm text-neutral-500 dark:text-neutral-100">
             Loading admin panel...
           </span>
         </div>
@@ -91,7 +101,7 @@ export default function AdminLayoutWrapper({
   // Public pages (login etc.) — no layout
   if (isPublicRoute) {
     return (
-      <div className="admin-wrapper dark:bg-[var(--admin-neutral-903)]">
+      <div className="admin-wrapper bg-neutral-0 dark:bg-neutral-904 text-neutral-700 dark:text-neutral-20 min-h-screen">
         <Toaster position="top-right" />
         {children}
       </div>
@@ -99,7 +109,7 @@ export default function AdminLayoutWrapper({
   }
 
   return (
-    <div className="admin-wrapper dark:bg-[var(--admin-neutral-903)]">
+    <div className="admin-wrapper bg-neutral-20 dark:bg-neutral-903 text-neutral-700 dark:text-neutral-20 min-h-screen">
       <Toaster position="top-right" />
 
       {/* Sidebar Overlay (mobile) */}

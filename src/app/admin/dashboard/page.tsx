@@ -184,19 +184,26 @@ export default function AdminDashboardPage() {
         </div>
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={data.daily_logins || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-neutral-30)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-card-border)" />
             <XAxis
               dataKey="date"
-              tick={{ fontSize: 11, fill: "var(--admin-neutral-500)" }}
+              stroke="var(--admin-card-border)"
+              tick={{ fontSize: 11, fill: "var(--admin-text-sub)" }}
             />
-            <YAxis tick={{ fontSize: 11, fill: "var(--admin-neutral-500)" }} />
+            <YAxis
+              stroke="var(--admin-card-border)"
+              tick={{ fontSize: 11, fill: "var(--admin-text-sub)" }}
+            />
             <Tooltip
               contentStyle={{
-                background: "var(--admin-neutral-0)",
-                border: "1px solid var(--admin-neutral-30)",
+                backgroundColor: "var(--admin-card-bg)",
+                borderColor: "var(--admin-card-border)",
                 borderRadius: "8px",
                 fontSize: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               }}
+              itemStyle={{ color: "var(--admin-text-main)" }}
+              labelStyle={{ color: "var(--admin-text-sub)", fontWeight: 600 }}
             />
             <Line
               type="monotone"
@@ -217,19 +224,26 @@ export default function AdminDashboardPage() {
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data.contest_participants || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-neutral-30)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-card-border)" />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 10, fill: "var(--admin-neutral-500)" }}
+              stroke="var(--admin-card-border)"
+              tick={{ fontSize: 10, fill: "var(--admin-text-sub)" }}
             />
-            <YAxis tick={{ fontSize: 10, fill: "var(--admin-neutral-500)" }} />
+            <YAxis
+              stroke="var(--admin-card-border)"
+              tick={{ fontSize: 10, fill: "var(--admin-text-sub)" }}
+            />
             <Tooltip
               contentStyle={{
-                background: "var(--admin-neutral-0)",
-                border: "1px solid var(--admin-neutral-30)",
+                backgroundColor: "var(--admin-card-bg)",
+                borderColor: "var(--admin-card-border)",
                 borderRadius: "8px",
                 fontSize: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               }}
+              itemStyle={{ color: "var(--admin-text-main)" }}
+              labelStyle={{ color: "var(--admin-text-sub)", fontWeight: 600 }}
             />
             <Bar dataKey="count" fill="var(--admin-primary)" radius={[4, 4, 0, 0]} />
           </BarChart>
@@ -243,19 +257,26 @@ export default function AdminDashboardPage() {
         </div>
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data.quiz_participants || []}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-neutral-30)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--admin-card-border)" />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 10, fill: "var(--admin-neutral-500)" }}
+              stroke="var(--admin-card-border)"
+              tick={{ fontSize: 10, fill: "var(--admin-text-sub)" }}
             />
-            <YAxis tick={{ fontSize: 10, fill: "var(--admin-neutral-500)" }} />
+            <YAxis
+              stroke="var(--admin-card-border)"
+              tick={{ fontSize: 10, fill: "var(--admin-text-sub)" }}
+            />
             <Tooltip
               contentStyle={{
-                background: "var(--admin-neutral-0)",
-                border: "1px solid var(--admin-neutral-30)",
+                backgroundColor: "var(--admin-card-bg)",
+                borderColor: "var(--admin-card-border)",
                 borderRadius: "8px",
                 fontSize: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
               }}
+              itemStyle={{ color: "var(--admin-text-main)" }}
+              labelStyle={{ color: "var(--admin-text-sub)", fontWeight: 600 }}
             />
             <Bar
               dataKey="count"
@@ -449,17 +470,20 @@ export default function AdminDashboardPage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: "var(--admin-neutral-0)",
-                    border: "1px solid var(--admin-neutral-30)",
+                    backgroundColor: "var(--admin-card-bg)",
+                    borderColor: "var(--admin-card-border)",
                     borderRadius: "8px",
                     fontSize: "12px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   }}
+                  itemStyle={{ color: "var(--admin-text-main)" }}
+                  labelStyle={{ color: "var(--admin-text-sub)", fontWeight: 600 }}
                 />
                 <Legend
                   iconType="circle"
                   iconSize={8}
                   formatter={(val) => (
-                    <span style={{ fontSize: "11px" }}>{val}</span>
+                    <span style={{ fontSize: "11px", color: "var(--admin-text-sub)" }}>{val}</span>
                   )}
                 />
               </PieChart>
@@ -501,17 +525,20 @@ export default function AdminDashboardPage() {
                 </Pie>
                 <Tooltip
                   contentStyle={{
-                    background: "var(--admin-neutral-0)",
-                    border: "1px solid var(--admin-neutral-30)",
+                    backgroundColor: "var(--admin-card-bg)",
+                    borderColor: "var(--admin-card-border)",
                     borderRadius: "8px",
                     fontSize: "12px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                   }}
+                  itemStyle={{ color: "var(--admin-text-main)" }}
+                  labelStyle={{ color: "var(--admin-text-sub)", fontWeight: 600 }}
                 />
                 <Legend
                   iconType="circle"
                   iconSize={8}
                   formatter={(val) => (
-                    <span style={{ fontSize: "11px" }}>{val}</span>
+                    <span style={{ fontSize: "11px", color: "var(--admin-text-sub)" }}>{val}</span>
                   )}
                 />
               </PieChart>

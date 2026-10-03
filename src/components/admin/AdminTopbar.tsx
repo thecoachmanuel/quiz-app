@@ -63,6 +63,10 @@ export default function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
     setIsDark(isDarkStored);
     if (isDarkStored) {
       document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
     }
   }, []);
 
@@ -91,9 +95,11 @@ export default function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
     setIsDark(newDark);
     if (newDark) {
       document.documentElement.classList.add("dark");
+      document.documentElement.setAttribute("data-theme", "dark");
       localStorage.setItem("theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
+      document.documentElement.setAttribute("data-theme", "light");
       localStorage.setItem("theme", "light");
     }
   };
@@ -124,7 +130,7 @@ export default function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
 
   const avatarUrl =
     user?.avatar ||
-    `https://eu.ui-avatars.com/api/?name=${encodeURIComponent(user?.full_name || "Admin")}&background=6366f1&color=fff`;
+    "/assets/admin/images/user-big.png";
 
   return (
     <nav className="admin-topbar">
