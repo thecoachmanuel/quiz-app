@@ -25,6 +25,7 @@ interface AdminAuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 
+  login: (token: string, user: AdminUser) => void;
   setToken: (token: string) => void;
   setUser: (user: AdminUser) => void;
   logout: () => void;
@@ -38,6 +39,11 @@ export const useAdminAuthStore = create<AdminAuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: false,
+
+      login: (token: string, user: AdminUser) => {
+        setAdminToken(token);
+        set({ token, user, isAuthenticated: true });
+      },
 
       setToken: (token: string) => {
         setAdminToken(token);

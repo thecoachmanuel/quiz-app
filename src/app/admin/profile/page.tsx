@@ -7,8 +7,10 @@ import toast from "react-hot-toast";
 
 export default function AdminProfilePage() {
   const { user, login } = useAdminAuthStore();
-  const [name, setName] = useState(user?.name || "Master Administrator");
-  const [email, setEmail] = useState(user?.email || "admin@softivus.com");
+  const [name, setName] = useState(
+    user?.full_name || user?.name || "Master Administrator"
+  );
+  const [email, setEmail] = useState(user?.email || "admin@quizapp.com");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,7 +23,12 @@ export default function AdminProfilePage() {
     setTimeout(() => {
       setSavingProfile(false);
       if (user) {
-        login("mock-token", { ...user, name, email });
+        login("mock-token", {
+          ...user,
+          full_name: name,
+          name,
+          email,
+        });
       }
       toast.success("Profile information updated successfully!");
     }, 500);
