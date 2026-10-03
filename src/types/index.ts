@@ -136,6 +136,7 @@ export interface ServiceSwitchType {
 }
 
 export interface ApplicationInfoType {
+  site_name?: string;
   company_info: CompanyInfoType;
   frontend_url: string;
   theme: ThemeColorType;
