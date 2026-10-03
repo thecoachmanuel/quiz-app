@@ -31,8 +31,11 @@ export default function InputPhone({
   const { tran } = useTranslations();
   const filteredCountries = useMemo(
     () =>
-      countryCodes.filter((country) =>
-        country.name.toLowerCase().includes(search.toLowerCase()),
+      countryCodes.filter(
+        (country) =>
+          country.name.toLowerCase().includes(search.toLowerCase()) ||
+          country.dial_code.includes(search) ||
+          country.code.toLowerCase().includes(search.toLowerCase()),
       ),
     [search],
   );

@@ -32,12 +32,14 @@ export default function SignUpForm({ countryCode }: Props) {
   const refererUserName = searchParams.get("referer");
   const { login } = useAuthStore((state: AuthStore) => state);
   const router = useRouter();
-  const filteredCountry = useMemo(
+  const defaultCountry = useMemo(
     () =>
-      countryCodes.find(
-        (country) => country.code.toLowerCase() === countryCode.toLowerCase(),
-      ),
-    [countryCode],
+      countryCodes.find((country) => country.code === "NG") || {
+        name: "Nigeria",
+        dial_code: "+234",
+        code: "NG",
+      },
+    [],
   );
 
   const [signUpForm, setSignUpForm] = useState({
@@ -46,9 +48,9 @@ export default function SignUpForm({ countryCode }: Props) {
     email: "",
     referer: refererUserName || "",
     password: "",
-    country_code: filteredCountry?.name || "US",
+    country_code: defaultCountry.code,
     phone: "",
-    dial_code: filteredCountry?.dial_code || "+1",
+    dial_code: defaultCountry.dial_code,
     password_confirmation: "",
     captcha_token: "",
     agree: 0,

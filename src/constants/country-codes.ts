@@ -1,5 +1,10 @@
 export const countryCodes = [
   {
+    name: "Nigeria",
+    dial_code: "+234",
+    code: "NG",
+  },
+  {
     name: "Afghanistan",
     dial_code: "+93",
     code: "AF",
