@@ -48,7 +48,7 @@ const buildRemotePatterns = (urls: string[]): RemotePattern[] => {
 
 const buildRewrites = () => {
   // Only rewrite /storage if an external storage URL is configured and different from local app
-  const routes = [];
+  const routes: Array<{ source: string; destination: string }> = [];
   if (process.env.NEXT_PUBLIC_STORAGE_URL) {
     routes.push({
       source: "/storage/:path*",
