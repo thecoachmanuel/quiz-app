@@ -161,7 +161,7 @@ export default function AdminBadgesPage() {
             type="button"
             onClick={() => {
               if (confirm("Delete badge?")) {
-                setBadges((prev) => prev.filter((b) => b.id !== row.id));
+                deleteBadge(row.id);
                 toast.success("Badge deleted");
               }
             }}

@@ -10,6 +10,7 @@ import { useGameStore, WordlingGame } from "@/stores/gameStore";
 export default function AdminWordlingPage() {
   const games = useGameStore((state) => state.wordling);
   const addWordling = useGameStore((state) => state.addWordling);
+  const deleteWordling = useGameStore((state) => state.deleteWordling);
   const toggleWordlingStatus = useGameStore((state) => state.toggleWordlingStatus);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -137,7 +138,7 @@ export default function AdminWordlingPage() {
             type="button"
             onClick={() => {
               if (confirm("Delete this game?")) {
-                setGames((prev) => prev.filter((g) => g.id !== row.id));
+                deleteWordling(row.id);
                 toast.success("Game deleted");
               }
             }}

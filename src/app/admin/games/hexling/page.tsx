@@ -10,6 +10,7 @@ import { useGameStore, HexlingGame } from "@/stores/gameStore";
 export default function AdminHexlingPage() {
   const games = useGameStore((state) => state.hexling);
   const addHexling = useGameStore((state) => state.addHexling);
+  const deleteHexling = useGameStore((state) => state.deleteHexling);
   const toggleHexlingStatus = useGameStore((state) => state.toggleHexlingStatus);
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -130,7 +131,7 @@ export default function AdminHexlingPage() {
             type="button"
             onClick={() => {
               if (confirm("Delete this game?")) {
-                setGames((prev) => prev.filter((g) => g.id !== row.id));
+                deleteHexling(row.id);
                 toast.success("Game deleted");
               }
             }}

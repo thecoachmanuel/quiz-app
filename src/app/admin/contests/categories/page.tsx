@@ -108,7 +108,7 @@ export default function ContestCategoriesPage() {
             type="button"
             onClick={() => {
               if (confirm("Delete category?")) {
-                setCategories((prev) => prev.filter((c) => c.id !== row.id));
+                deleteCategory(row.id);
                 toast.success("Category deleted");
               }
             }}
