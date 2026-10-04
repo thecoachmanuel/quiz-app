@@ -21,26 +21,36 @@ if (!global.mongooseCache) {
   global.mongooseCache = cached;
 }
 
+export function isConfiguredMongoUri(uri?: string): boolean {
+  if (!uri) return false;
+  if (uri.includes("<username>") || uri.includes("<password>")) return false;
+  return uri.startsWith("mongodb://") || uri.startsWith("mongodb+srv://");
+}
+
 /**
  * Global cached MongoDB connection for serverless Next.js
  */
 export async function connectToDatabase(): Promise<typeof mongoose> {
-  if (!MONGODB_URI) {
+  const uri = process.env.MONGODB_URI;
+  if (!isConfiguredMongoUri(uri)) {
     throw new Error(
-      "Please define the MONGODB_URI environment variable inside .env.local or Vercel Environment Variables."
+      "MONGODB_URI is not configured or contains placeholder credentials."
     );
   }
 
-  if (cached.conn) {
+  if (cached.conn && cached.conn.connection.readyState === 1) {
     return cached.conn;
   }
 
   if (!cached.promise) {
-    const opts = {
+    const opts: mongoose.ConnectOptions = {
       bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 20000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((m) => {
+    cached.promise = mongoose.connect(uri as string, opts).then((m) => {
       return m;
     });
   }

@@ -5,62 +5,13 @@ import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface WordlingGame {
-  id: number;
-  game_type: "wordling_min" | "wordling_main" | "wordling_max";
-  secret_word: string;
-  game_date: string;
-  max_attempts: number;
-  reward_coins: number;
-  play_count: number;
-  status: "active" | "inactive";
-}
-
-const INITIAL_WORDLING: WordlingGame[] = [
-  {
-    id: 1,
-    game_type: "wordling_main",
-    secret_word: "PLANET",
-    game_date: "2024-03-03",
-    max_attempts: 6,
-    reward_coins: 30,
-    play_count: 620,
-    status: "active",
-  },
-  {
-    id: 2,
-    game_type: "wordling_min",
-    secret_word: "STAR",
-    game_date: "2024-03-03",
-    max_attempts: 5,
-    reward_coins: 20,
-    play_count: 410,
-    status: "active",
-  },
-  {
-    id: 3,
-    game_type: "wordling_max",
-    secret_word: "GALAXY",
-    game_date: "2024-03-03",
-    max_attempts: 7,
-    reward_coins: 50,
-    play_count: 850,
-    status: "active",
-  },
-  {
-    id: 4,
-    game_type: "wordling_main",
-    secret_word: "ROCKET",
-    game_date: "2024-03-02",
-    max_attempts: 6,
-    reward_coins: 30,
-    play_count: 1200,
-    status: "inactive",
-  },
-];
+import { useGameStore, WordlingGame } from "@/stores/gameStore";
 
 export default function AdminWordlingPage() {
-  const [games, setGames] = useState<WordlingGame[]>(INITIAL_WORDLING);
+  const games = useGameStore((state) => state.wordling);
+  const addWordling = useGameStore((state) => state.addWordling);
+  const toggleWordlingStatus = useGameStore((state) => state.toggleWordlingStatus);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [secretWord, setSecretWord] = useState("");
   const [gameType, setGameType] = useState<
@@ -77,8 +28,7 @@ export default function AdminWordlingPage() {
       return;
     }
 
-    const newGame: WordlingGame = {
-      id: Date.now(),
+    addWordling({
       game_type: gameType,
       secret_word: secretWord.trim().toUpperCase(),
       game_date: gameDate,
@@ -86,22 +36,20 @@ export default function AdminWordlingPage() {
       reward_coins: rewardCoins,
       play_count: 0,
       status: "active",
-    };
+    });
 
-    setGames((prev) => [newGame, ...prev]);
     toast.success("Wordling game added successfully");
     setModalOpen(false);
     setSecretWord("");
   };
 
   const toggleStatus = (id: number) => {
-    setGames((prev) =>
-      prev.map((g) =>
-        g.id === id
-          ? { ...g, status: g.status === "active" ? "inactive" : "active" }
-          : g
-      )
-    );
+    const game = games.find((g) => g.id === id);
+    toggleWordlingStatus(id);
+    if (game) {
+      const next = game.status === "active" ? "inactive" : "active";
+      toast.success(`Wordling game status set to ${next}`);
+    }
   };
 
   const columns = [

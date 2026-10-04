@@ -6,37 +6,69 @@ import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import { useQuizStore } from "@/stores/quizStore";
+import { useEffect } from "react";
+
 export default function EditQuizPage() {
   const router = useRouter();
   const params = useParams();
   const quizId = params?.id;
+  const numId = Number(quizId);
+
+  const quizzes = useQuizStore((state) => state.quizzes);
+  const updateQuiz = useQuizStore((state) => state.updateQuiz);
+  const storeCategories = useQuizStore((state) => state.categories);
+  const storeLevels = useQuizStore((state) => state.levels);
+
   const [submitting, setSubmitting] = useState(false);
 
+  const currentQuiz = quizzes.find((q) => q.id === numId);
+
   const [formData, setFormData] = useState({
-    title: "World Capitals & Geography Blitz",
-    category: "Geography",
-    level: "Intermediate",
-    duration_minutes: 5,
-    passing_score: 70,
-    reward_coins: 50,
-    entry_fee: 0,
-    description:
-      "Test your global geographical knowledge! Can you guess capitals, famous landmarks, and continental borders?",
-    status: "published",
-    image: "",
+    title: currentQuiz?.title || "",
+    category: currentQuiz?.category || "Geography",
+    level: currentQuiz?.level || "Intermediate",
+    duration_minutes: currentQuiz?.duration_minutes || 5,
+    passing_score: currentQuiz?.passing_score || 70,
+    reward_coins: currentQuiz?.reward_coins || 50,
+    entry_fee: currentQuiz?.entry_fee || 0,
+    description: currentQuiz?.description || "",
+    status: (currentQuiz?.status || "published") as "published" | "draft",
+    image: currentQuiz?.image || "",
   });
 
-  const categories = [
-    "Geography",
-    "Science",
-    "History",
-    "Entertainment",
-    "Technology",
-    "Sports",
-    "General Knowledge",
-  ];
+  useEffect(() => {
+    if (currentQuiz) {
+      setFormData({
+        title: currentQuiz.title,
+        category: currentQuiz.category,
+        level: currentQuiz.level,
+        duration_minutes: currentQuiz.duration_minutes || 5,
+        passing_score: currentQuiz.passing_score || 70,
+        reward_coins: currentQuiz.reward_coins || 50,
+        entry_fee: currentQuiz.entry_fee || 0,
+        description: currentQuiz.description || "",
+        status: currentQuiz.status,
+        image: currentQuiz.image || "",
+      });
+    }
+  }, [currentQuiz]);
 
-  const levels = ["Beginner", "Intermediate", "Advanced", "Master"];
+  const categories = storeCategories.length
+    ? storeCategories.map((c) => c.title)
+    : [
+        "Geography",
+        "Science",
+        "History",
+        "Entertainment",
+        "Technology",
+        "Sports",
+        "General Knowledge",
+      ];
+
+  const levels = storeLevels.length
+    ? storeLevels.map((l) => l.title)
+    : ["Beginner", "Intermediate", "Advanced", "Master"];
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -49,11 +81,31 @@ export default function EditQuizPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.title.trim()) {
+      toast.error("Please enter a quiz title");
+      return;
+    }
+
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      updateQuiz(numId, {
+        title: formData.title.trim(),
+        category: formData.category,
+        level: formData.level,
+        duration_minutes: Number(formData.duration_minutes) || 5,
+        passing_score: Number(formData.passing_score) || 70,
+        reward_coins: Number(formData.reward_coins) || 50,
+        entry_fee: Number(formData.entry_fee) || 0,
+        description: formData.description,
+        status: formData.status,
+        image: formData.image,
+      });
       toast.success("Quiz updated successfully!");
-    }, 600);
+    } catch {
+      toast.error("Failed to update quiz");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

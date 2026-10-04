@@ -5,42 +5,13 @@ import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface HexlingGame {
-  id: number;
-  root_word: string;
-  center_letter: string;
-  game_date: string;
-  words_count: number;
-  reward_coins: number;
-  play_count: number;
-  status: "active" | "inactive";
-}
-
-const INITIAL_HEXLING: HexlingGame[] = [
-  {
-    id: 1,
-    root_word: "TRIANGLE",
-    center_letter: "A",
-    game_date: "2024-03-03",
-    words_count: 28,
-    reward_coins: 75,
-    play_count: 512,
-    status: "active",
-  },
-  {
-    id: 2,
-    root_word: "FORTUNE",
-    center_letter: "T",
-    game_date: "2024-03-02",
-    words_count: 22,
-    reward_coins: 60,
-    play_count: 820,
-    status: "inactive",
-  },
-];
+import { useGameStore, HexlingGame } from "@/stores/gameStore";
 
 export default function AdminHexlingPage() {
-  const [games, setGames] = useState<HexlingGame[]>(INITIAL_HEXLING);
+  const games = useGameStore((state) => state.hexling);
+  const addHexling = useGameStore((state) => state.addHexling);
+  const toggleHexlingStatus = useGameStore((state) => state.toggleHexlingStatus);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [rootWord, setRootWord] = useState("");
   const [centerLetter, setCenterLetter] = useState("A");
@@ -60,8 +31,7 @@ export default function AdminHexlingPage() {
       .map((w) => w.trim().toUpperCase())
       .filter(Boolean);
 
-    const newGame: HexlingGame = {
-      id: Date.now(),
+    addHexling({
       root_word: rootWord.trim().toUpperCase(),
       center_letter: centerLetter.trim().toUpperCase(),
       game_date: gameDate,
@@ -69,9 +39,8 @@ export default function AdminHexlingPage() {
       reward_coins: rewardCoins,
       play_count: 0,
       status: "active",
-    };
+    });
 
-    setGames((prev) => [newGame, ...prev]);
     toast.success("Hexling game added successfully");
     setModalOpen(false);
     setRootWord("");
@@ -79,13 +48,12 @@ export default function AdminHexlingPage() {
   };
 
   const toggleStatus = (id: number) => {
-    setGames((prev) =>
-      prev.map((g) =>
-        g.id === id
-          ? { ...g, status: g.status === "active" ? "inactive" : "active" }
-          : g
-      )
-    );
+    const game = games.find((g) => g.id === id);
+    toggleHexlingStatus(id);
+    if (game) {
+      const next = game.status === "active" ? "inactive" : "active";
+      toast.success(`Hexling game status set to ${next}`);
+    }
   };
 
   const columns = [

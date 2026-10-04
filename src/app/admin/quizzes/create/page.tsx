@@ -6,8 +6,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import { useQuizStore } from "@/stores/quizStore";
+
 export default function CreateQuizPage() {
   const router = useRouter();
+  const addQuiz = useQuizStore((state) => state.addQuiz);
+  const storeCategories = useQuizStore((state) => state.categories);
+  const storeLevels = useQuizStore((state) => state.levels);
+
   const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -19,21 +25,25 @@ export default function CreateQuizPage() {
     reward_coins: 50,
     entry_fee: 0,
     description: "",
-    status: "published",
+    status: "published" as "published" | "draft",
     image: "",
   });
 
-  const categories = [
-    "Geography",
-    "Science",
-    "History",
-    "Entertainment",
-    "Technology",
-    "Sports",
-    "General Knowledge",
-  ];
+  const categories = storeCategories.length
+    ? storeCategories.map((c) => c.title)
+    : [
+        "Geography",
+        "Science",
+        "History",
+        "Entertainment",
+        "Technology",
+        "Sports",
+        "General Knowledge",
+      ];
 
-  const levels = ["Beginner", "Intermediate", "Advanced", "Master"];
+  const levels = storeLevels.length
+    ? storeLevels.map((l) => l.title)
+    : ["Beginner", "Intermediate", "Advanced", "Master"];
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -52,11 +62,29 @@ export default function CreateQuizPage() {
     }
 
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      const created = addQuiz({
+        title: formData.title.trim(),
+        category: formData.category,
+        level: formData.level,
+        duration_minutes: Number(formData.duration_minutes) || 5,
+        passing_score: Number(formData.passing_score) || 70,
+        reward_coins: Number(formData.reward_coins) || 50,
+        entry_fee: Number(formData.entry_fee) || 0,
+        description: formData.description,
+        status: formData.status,
+        image: formData.image || "/quiz-banner.png",
+        total_questions: 0,
+        play_count: 0,
+      });
+
       toast.success("Quiz created successfully! Now add questions.");
-      router.push("/admin/quizzes");
-    }, 600);
+      router.push(`/admin/quizzes/${created.id}/questions`);
+    } catch {
+      toast.error("Failed to create quiz");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

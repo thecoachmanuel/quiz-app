@@ -38,10 +38,12 @@ export const getFetchInstance = async <T>({
         Accept: "application/json",
         ...(config?.headers || {}),
       },
+      signal: AbortSignal.timeout(3000),
       ...(cacheKey
         ? {
             next: {
               tags: [cacheKey],
+              revalidate: 3600,
             },
           }
         : {}),
@@ -57,6 +59,10 @@ export const getFetchInstance = async <T>({
 
   for (const interceptor of responseInterceptors) {
     response = await interceptor(response);
+  }
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
   }
 
   return (await response.json()) as T;

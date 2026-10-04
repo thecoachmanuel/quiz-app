@@ -1,6 +1,8 @@
 "use client";
 
 import { adminFetch } from "@/configs/adminApi";
+import { useAdminAuthStore } from "@/stores/adminAuthStore";
+import { useSiteSettingsStore } from "@/stores/siteSettingsStore";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -66,6 +68,12 @@ const DEFAULT_STAT_ICONS: Record<string, string> = {
 export default function AdminDashboardPage() {
   const [data, setData] = useState<DashboardData>({});
   const [loading, setLoading] = useState(true);
+  const { settings } = useSiteSettingsStore();
+  const { user } = useAdminAuthStore();
+  const siteName = settings.site_name || "Quizix";
+  const logoLight = settings.logo_light || "/assets/admin/images/logo-light.png";
+  const logoDark = settings.logo_dark || "/assets/admin/images/logo-dark.png";
+  const adminName = user?.full_name || user?.name || "Admin";
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -144,6 +152,63 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="grid grid-cols-2 gap-4 xl:gap-6">
+      {/* ---- Welcome Banner ---- */}
+      <div className="col-span-2 admin-white-box overflow-hidden relative">
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            background: "linear-gradient(135deg, var(--admin-primary) 0%, var(--admin-secondary) 100%)",
+          }}
+        />
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            {/* Logo */}
+            <div className="flex items-center gap-3">
+              <img
+                src={logoLight}
+                alt={siteName}
+                className="h-10 w-auto object-contain dark:hidden"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+              <img
+                src={logoDark}
+                alt={siteName}
+                className="h-10 w-auto object-contain hidden dark:block"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                }}
+              />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-[var(--admin-neutral-900)] dark:text-white">
+                Welcome back, {adminName}! 👋
+              </h1>
+              <p className="text-xs text-[var(--admin-neutral-400)] mt-0.5">
+                {siteName} Admin Dashboard · {new Date().toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            <Link
+              href="/"
+              target="_blank"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg border border-[var(--admin-neutral-30)] dark:border-[var(--admin-neutral-700)] hover:border-[var(--admin-primary)] hover:text-[var(--admin-primary)] transition-colors"
+            >
+              <i className="ph ph-globe" />
+              Visit Site
+            </Link>
+            <Link
+              href="/admin/settings/general"
+              className="inline-flex items-center gap-1.5 text-xs px-3 py-2 rounded-lg bg-[var(--admin-primary)] text-white hover:opacity-90 transition-opacity"
+            >
+              <i className="ph ph-gear" />
+              Settings
+            </Link>
+          </div>
+        </div>
+      </div>
       {/* ---- Stat Cards ---- */}
       <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 xxl:grid-cols-4 gap-4 xl:gap-6">
         {(data.state || []).map((item, i) => (

@@ -75,23 +75,28 @@ export default function SignUpForm({ countryCode }: Props) {
 
   const isFormValid = useMemo(
     () =>
-      signUpForm.first_name &&
-      signUpForm.last_name &&
-      signUpForm.email &&
-      signUpForm.password &&
-      signUpForm.password_confirmation &&
-      signUpForm.country_code &&
-      signUpForm.dial_code &&
-      signUpForm.agree,
+      Boolean(
+        signUpForm.first_name?.trim() &&
+        signUpForm.last_name?.trim() &&
+        signUpForm.email?.trim() &&
+        signUpForm.password &&
+        signUpForm.password_confirmation &&
+        isPasswordMatch &&
+        signUpForm.country_code &&
+        signUpForm.dial_code &&
+        (!authConfig?.is_agreement_enabled || signUpForm.agree)
+      ),
     [
       signUpForm.first_name,
       signUpForm.last_name,
       signUpForm.email,
       signUpForm.password,
       signUpForm.password_confirmation,
+      isPasswordMatch,
       signUpForm.country_code,
       signUpForm.dial_code,
       signUpForm.agree,
+      authConfig?.is_agreement_enabled,
     ],
   );
 
@@ -112,16 +117,22 @@ export default function SignUpForm({ countryCode }: Props) {
     e.preventDefault();
     if (!isFormValid) {
       setFrontendValidation({
-        first_name: !signUpForm.first_name,
-        last_name: !signUpForm.last_name,
-        email: !signUpForm.email,
+        first_name: !signUpForm.first_name?.trim(),
+        last_name: !signUpForm.last_name?.trim(),
+        email: !signUpForm.email?.trim(),
         password: !signUpForm.password || !isPasswordMatch,
         password_confirmation:
           !signUpForm.password_confirmation || !isPasswordMatch,
         country_code: !signUpForm.country_code,
         dial_code: !signUpForm.dial_code,
-        agree: !signUpForm.agree,
+        agree: Boolean(authConfig?.is_agreement_enabled && !signUpForm.agree),
       });
+
+      if (signUpForm.password && signUpForm.password_confirmation && !isPasswordMatch) {
+        toast.error(tran("Passwords do not match"));
+      } else {
+        toast.error(tran("Please fill in all required fields"));
+      }
       return;
     }
     if (authConfig?.recaptcha?.is_enabled) {
@@ -133,6 +144,9 @@ export default function SignUpForm({ countryCode }: Props) {
     mutate(
       {
         ...signUpForm,
+        first_name: signUpForm.first_name.trim(),
+        last_name: signUpForm.last_name.trim(),
+        email: signUpForm.email.trim(),
         phone: `${signUpForm.dial_code}${signUpForm.phone}`,
       },
       {
@@ -149,7 +163,8 @@ export default function SignUpForm({ countryCode }: Props) {
 
           login(data.token, user);
 
-          router.push(redirect(user));
+          const destination = redirect(user) || "/dashboard/profile";
+          router.push(destination);
         },
       },
     );

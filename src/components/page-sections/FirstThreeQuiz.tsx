@@ -1,5 +1,6 @@
 /** @format */
 "use client";
+import { useQuizStore } from "@/stores/quizStore";
 import { useGetQuery } from "@/hooks/mutate/useGetQuery";
 import { usePageComponent } from "@/hooks/usePageComponent";
 import { QuizPaginationApiResponse } from "@/types/quiz";
@@ -43,6 +44,15 @@ const FirstThreeQuiz = ({ slug }: { slug: string }) => {
     },
   });
 
+  const getFrontendQuizzes = useQuizStore((state) => state.getFrontendQuizzes);
+  const storeQuizList = getFrontendQuizzes({
+    page: 1,
+    per_page: 3,
+  });
+
+  const effectiveQuizList =
+    quizList?.data && quizList.data.length > 0 ? quizList : storeQuizList;
+
   return (
     <div className="custom-container stp-30 sbp-30">
       <div className="mx-auto flex max-w-[526px] flex-col items-center justify-center text-center">
@@ -58,10 +68,10 @@ const FirstThreeQuiz = ({ slug }: { slug: string }) => {
       {/* quiz list */}
 
       <div className="stp-10">
-        {isQuizListLoading ? (
+        {isQuizListLoading && !effectiveQuizList ? (
           <Skeleton total={3} />
         ) : (
-          <QuizItems quizList={quizList} refetch={refetch} />
+          <QuizItems quizList={effectiveQuizList} refetch={refetch} />
         )}
       </div>
 

@@ -1,24 +1,45 @@
 "use client";
 
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
-import { useState } from "react";
+import { useSiteSettingsStore } from "@/stores/siteSettingsStore";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 export default function AdminGeneralSettingsPage() {
+  const { settings, updateSettings } = useSiteSettingsStore();
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    site_name: "Quizix",
-    company_email: "support@quizix.com",
-    company_phone: "+1 800-555-QUIZ",
-    website: "https://quiz.softivus.com",
-    timezone: "UTC",
-    currency: "USD",
-    currency_symbol: "$",
-    frontend_url: "https://quiz.softivus.com",
-    address_country: "United States",
-    address_city: "San Francisco",
-    address_line: "100 Market Street, Suite 400",
+    site_name: settings.site_name,
+    company_email: settings.company_email,
+    company_phone: settings.company_phone,
+    website: settings.website,
+    timezone: settings.timezone,
+    currency: settings.currency,
+    currency_symbol: settings.currency_symbol,
+    frontend_url: settings.website,
+    address_country: settings.address_country,
+    address_city: settings.address_city,
+    address_line: settings.address_line,
   });
+
+  // Sync from store on mount
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      site_name: settings.site_name,
+      company_email: settings.company_email,
+      company_phone: settings.company_phone,
+      website: settings.website,
+      timezone: settings.timezone,
+      currency: settings.currency,
+      currency_symbol: settings.currency_symbol,
+      frontend_url: settings.website,
+      address_country: settings.address_country,
+      address_city: settings.address_city,
+      address_line: settings.address_line,
+    }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -31,6 +52,19 @@ export default function AdminGeneralSettingsPage() {
     e.preventDefault();
     setSaving(true);
     setTimeout(() => {
+      // Persist to shared store so main site reflects changes
+      updateSettings({
+        site_name: formData.site_name,
+        company_email: formData.company_email,
+        company_phone: formData.company_phone,
+        website: formData.website,
+        timezone: formData.timezone,
+        currency: formData.currency,
+        currency_symbol: formData.currency_symbol,
+        address_country: formData.address_country,
+        address_city: formData.address_city,
+        address_line: formData.address_line,
+      });
       setSaving(false);
       toast.success("General settings saved successfully!");
     }, 600);

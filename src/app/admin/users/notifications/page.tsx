@@ -1,6 +1,7 @@
 "use client";
 
 import AdminPageHeader from "@/components/admin/AdminPageHeader";
+import { useUserStore } from "@/stores/userStore";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -37,7 +38,8 @@ export default function SendNotificationPage() {
         "Hi {{user_name}},\n\nCheck out your leaderboard standing this week and claim your reward coins in the app."
       );
     }
-  };
+  const sendNotification = useUserStore((state) => state.sendNotification);
+  const users = useUserStore((state) => state.users);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,15 +49,20 @@ export default function SendNotificationPage() {
     }
 
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
-      toast.success(
-        `${activeTab.toUpperCase()} notification dispatched successfully!`
-      );
-      setSubject("");
-      setMessage("");
-      setTemplate("");
-    }, 800);
+    sendNotification({
+      title: subject.trim(),
+      message: message.trim(),
+      target_audience: "all",
+      recipients_count: users.length,
+    });
+
+    setSubmitting(false);
+    toast.success(
+      `${activeTab.toUpperCase()} notification dispatched and logged successfully!`
+    );
+    setSubject("");
+    setMessage("");
+    setTemplate("");
   };
 
   return (

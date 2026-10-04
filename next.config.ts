@@ -47,20 +47,14 @@ const buildRemotePatterns = (urls: string[]): RemotePattern[] => {
 };
 
 const buildRewrites = () => {
-  if (!ASSETS_URL) {
-    throw new Error("ASSETS_URL is not defined");
-  }
-  const routes = [
-    {
+  // Only rewrite /storage if an external storage URL is configured and different from local app
+  const routes = [];
+  if (process.env.NEXT_PUBLIC_STORAGE_URL) {
+    routes.push({
       source: "/storage/:path*",
-      destination: `${ASSETS_URL}/storage/:path*`,
-    },
-    {
-      source: "/assets/:path*",
-      destination: `${ASSETS_URL}/assets/:path*`,
-    },
-  ];
-
+      destination: `${process.env.NEXT_PUBLIC_STORAGE_URL}/storage/:path*`,
+    });
+  }
   return async () => routes;
 };
 
@@ -76,7 +70,7 @@ const nextConfig: NextConfig = {
     unoptimized: true,
     dangerouslyAllowSVG: true,
     remotePatterns: buildRemotePatterns(TRUSTED_IMAGE_DOMAINS),
-    minimumCacheTTL: 60,
+    minimumCacheTTL: 86400,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
   },
 
@@ -85,13 +79,40 @@ const nextConfig: NextConfig = {
     silenceDeprecations: ["legacy-js-api"],
   },
 
-  rewrites: ASSETS_URL ? buildRewrites() : undefined,
+  rewrites: process.env.NEXT_PUBLIC_STORAGE_URL ? buildRewrites() : undefined,
 
   poweredByHeader: false,
   compress: true,
 
   async headers() {
     return [
+      {
+        source: "/_next/static/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/assets/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+      {
+        source: "/fonts/:path*",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
       {
         source: "/(.*)",
         headers: [

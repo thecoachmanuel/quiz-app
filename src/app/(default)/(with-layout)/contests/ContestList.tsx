@@ -18,6 +18,8 @@ const Pagination = dynamic(() => import("@/components/ui/Pagination"), {
 
 const PER_PAGE_ITEM = 9;
 
+import { useContestStore } from "@/stores/contestStore";
+
 const ContestList = () => {
   const token = getToken();
   const { tran } = useTranslations();
@@ -33,7 +35,7 @@ const ContestList = () => {
   } = useListParams({ baseUrl: "/contests" });
 
   const {
-    data: contests,
+    data: apiContests,
     isLoading,
     refetch,
   } = useGetQuery<ContestApiResponse>({
@@ -50,6 +52,17 @@ const ContestList = () => {
     },
   });
 
+  const getFrontendContests = useContestStore((state) => state.getFrontendContests);
+  const storeContests = getFrontendContests({
+    page,
+    per_page: PER_PAGE_ITEM,
+    search: debouncedSearchText,
+    category,
+  });
+
+  const contests =
+    apiContests?.data && apiContests.data.length > 0 ? apiContests : storeContests;
+
   return (
     <React.Fragment>
       <div className="pt-6">
@@ -62,7 +75,7 @@ const ContestList = () => {
       <div className="pt-8">
         <div className="">
           <h3 className="heading-3">{tran("Current Contests")}</h3>
-          {isLoading ? (
+          {isLoading && !contests ? (
             <Skeleton total={9} />
           ) : (
             <Contests contests={contests} refetch={refetch} />

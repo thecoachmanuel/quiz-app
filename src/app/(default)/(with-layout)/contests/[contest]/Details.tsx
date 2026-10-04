@@ -12,6 +12,8 @@ import moment from "moment";
 import PlayButton from "./PlayButton";
 import Tabs from "./Tabs";
 
+import { useContestStore } from "@/stores/contestStore";
+
 type Props = {
   slug: string;
 };
@@ -19,14 +21,20 @@ export default function Details({ slug }: Props) {
   const { tran } = useTranslations();
 
   const {
-    data: contest,
+    data: apiContest,
     refetch,
     isLoading,
   } = useGetQuery<ContestDetailsType>({
     url: `/single-contest/${slug}`,
   });
 
-  if (isLoading) {
+  const getFrontendContestDetails = useContestStore(
+    (state) => state.getFrontendContestDetails
+  );
+  const storeContest = getFrontendContestDetails(slug);
+  const contest = apiContest || storeContest;
+
+  if (isLoading && !contest) {
     return <Loader />;
   }
 

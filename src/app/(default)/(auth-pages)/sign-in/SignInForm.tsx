@@ -54,6 +54,10 @@ export default function SignInForm() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!credentials.username.trim() || !credentials.loginPassword) {
+      toast.error(tran("Please enter your email/username and password"));
+      return;
+    }
     if (authConfig?.recaptcha?.is_enabled) {
       if (!credentials.captcha_token) {
         toast.error(tran("Please verify you are not a robot"));
@@ -62,7 +66,7 @@ export default function SignInForm() {
     }
     mutate(
       {
-        username: credentials.username,
+        username: credentials.username.trim(),
         password: credentials.loginPassword,
         captcha_token: credentials.captcha_token,
       },
@@ -72,24 +76,28 @@ export default function SignInForm() {
 
           if (data?.user?.is_2fa_enabled) {
             setOtpBreakTimer(data?.user?.email);
-            router.push(redirect(data?.user));
-            router.push(`/2fa-verify?email=${data.user.email}`);
+            router.push(`/2fa-verify?email=${encodeURIComponent(data.user.email)}`);
             return;
           }
 
           if (!data?.token || !data?.user) {
             toast.error(tran("Something went wrong, please try again later"));
-
             return;
           }
 
           login(data.token, data.user);
 
-          if (decodeURIComponent(redirectPath) === "/") {
-            router.push(redirect(data.user));
-          } else {
-            router.push(decodeURIComponent(redirectPath));
-          }
+          const defaultTarget = redirect(data.user) || "/dashboard/profile";
+          const rawRedirect = decodeURIComponent(redirectPath);
+          const targetUrl =
+            rawRedirect &&
+            rawRedirect !== "/" &&
+            rawRedirect !== "/sign-in" &&
+            rawRedirect !== "/sign-up"
+              ? rawRedirect
+              : defaultTarget;
+
+          router.push(targetUrl);
         },
       },
     );

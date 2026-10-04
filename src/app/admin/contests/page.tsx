@@ -7,70 +7,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-interface ContestItem {
-  id: number;
-  title: string;
-  category: string;
-  start_time: string;
-  end_time: string;
-  entry_fee: number;
-  prize_pool: number;
-  participants_count: number;
-  status: "active" | "upcoming" | "ended";
-}
-
-const MOCK_CONTESTS: ContestItem[] = [
-  {
-    id: 1,
-    title: "Weekend Mega Championship 2024",
-    category: "General Trivia",
-    start_time: "2024-03-01 10:00",
-    end_time: "2024-03-03 23:59",
-    entry_fee: 50,
-    prize_pool: 1500,
-    participants_count: 248,
-    status: "active",
-  },
-  {
-    id: 2,
-    title: "Global Tech & Coding Masters",
-    category: "Technology",
-    start_time: "2024-03-10 14:00",
-    end_time: "2024-03-12 18:00",
-    entry_fee: 100,
-    prize_pool: 3000,
-    participants_count: 95,
-    status: "upcoming",
-  },
-  {
-    id: 3,
-    title: "Valentine Love & Cinema Trivia",
-    category: "Entertainment",
-    start_time: "2024-02-14 00:00",
-    end_time: "2024-02-15 23:59",
-    entry_fee: 25,
-    prize_pool: 800,
-    participants_count: 512,
-    status: "ended",
-  },
-  {
-    id: 4,
-    title: "World Cup Football Super Clash",
-    category: "Sports",
-    start_time: "2024-03-05 08:00",
-    end_time: "2024-03-07 20:00",
-    entry_fee: 40,
-    prize_pool: 1200,
-    participants_count: 310,
-    status: "active",
-  },
-];
+import { useContestStore, ContestItem } from "@/stores/contestStore";
 
 export default function AdminContestsPage() {
-  const [contests, setContests] = useState<ContestItem[]>(MOCK_CONTESTS);
+  const storeContests = useContestStore((state) => state.contests);
+  const deleteContest = useContestStore((state) => state.deleteContest);
+  const toggleContestStatus = useContestStore((state) => state.toggleContestStatus);
+  const setContests = useContestStore((state) => state.setContests);
+
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
+
+  const contests = storeContests;
 
   useEffect(() => {
     fetchContests();
@@ -84,7 +33,7 @@ export default function AdminContestsPage() {
         setContests(res.data);
       }
     } catch {
-      setContests(MOCK_CONTESTS);
+      // Keep store contests as fallback
     } finally {
       setLoading(false);
     }
@@ -92,7 +41,7 @@ export default function AdminContestsPage() {
 
   const handleDelete = (id: number) => {
     if (!confirm("Are you sure you want to delete this contest?")) return;
-    setContests((prev) => prev.filter((c) => c.id !== id));
+    deleteContest(id);
     toast.success("Contest removed");
   };
 

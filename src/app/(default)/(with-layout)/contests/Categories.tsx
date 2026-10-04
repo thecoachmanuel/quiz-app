@@ -1,5 +1,6 @@
 /** @format */
 "use client";
+import { useQuizStore } from "@/stores/quizStore";
 import ImageLoader from "@/components/ui/ImageLoader";
 import { useGetQuery } from "@/hooks/mutate/useGetQuery";
 import useClickOutside from "@/hooks/useClickOutside";
@@ -45,13 +46,43 @@ export default function Categories({
   useEffect(() => {
     handleSetRightWidth();
   }, [leftWidth, rightWidth]);
-
-  const { data: categories, isLoading } = useGetQuery<QuizCategoryApiResponse>({
+  const { data: apiCategories, isLoading } = useGetQuery<QuizCategoryApiResponse>({
     isPublic: true,
     url: "/quiz-categories",
   });
 
-  if (isLoading) {
+  const storeCategories = useQuizStore((state) => state.categories);
+  const formattedStoreCategories: QuizCategoryApiResponse = {
+    current_page: 1,
+    data: storeCategories
+      .filter((c) => c.status === "active")
+      .map((c) => ({
+        id: c.id,
+        title: c.title,
+        slug: c.slug,
+        icon: c.icon,
+        created_at: "",
+        updated_at: "",
+      })),
+    first_page_url: "",
+    from: 1,
+    last_page: 1,
+    last_page_url: "",
+    links: [],
+    next_page_url: null,
+    path: "",
+    per_page: 20,
+    prev_page_url: null,
+    to: storeCategories.length,
+    total: storeCategories.length,
+  };
+
+  const categories =
+    apiCategories?.data && apiCategories.data.length > 0
+      ? apiCategories
+      : formattedStoreCategories;
+
+  if (isLoading && !categories?.data?.length) {
     return <CategoriesSkeleton />;
   }
 

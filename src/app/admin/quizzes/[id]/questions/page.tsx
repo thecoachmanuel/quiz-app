@@ -6,65 +6,22 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface QuestionOption {
-  text: string;
-  is_correct: boolean;
-}
-
-interface QuestionItem {
-  id: number;
-  question: string;
-  type: "multiple_choice" | "true_false";
-  options: QuestionOption[];
-  points: number;
-  explanation?: string;
-}
-
-const MOCK_QUESTIONS: QuestionItem[] = [
-  {
-    id: 1,
-    question: "What is the capital city of Australia?",
-    type: "multiple_choice",
-    options: [
-      { text: "Sydney", is_correct: false },
-      { text: "Canberra", is_correct: true },
-      { text: "Melbourne", is_correct: false },
-      { text: "Brisbane", is_correct: false },
-    ],
-    points: 10,
-    explanation: "Canberra was chosen as the federal capital in 1908.",
-  },
-  {
-    id: 2,
-    question: "The Amazon River is the longest river in the world.",
-    type: "true_false",
-    options: [
-      { text: "True", is_correct: false },
-      { text: "False", is_correct: true },
-    ],
-    points: 10,
-    explanation: "The Nile River is traditionally considered the longest.",
-  },
-  {
-    id: 3,
-    question: "Which country has the most natural lakes in the world?",
-    type: "multiple_choice",
-    options: [
-      { text: "Canada", is_correct: true },
-      { text: "Russia", is_correct: false },
-      { text: "United States", is_correct: false },
-      { text: "Brazil", is_correct: false },
-    ],
-    points: 10,
-    explanation: "Canada contains more than half of all natural lakes on Earth.",
-  },
-];
+import { useQuizStore, QuestionItem, QuestionOption } from "@/stores/quizStore";
 
 export default function AdminQuizQuestionsPage() {
   const params = useParams();
   const quizId = params?.id;
+  const numId = Number(quizId);
 
-  const [questions, setQuestions] = useState<QuestionItem[]>(MOCK_QUESTIONS);
+  const quizzes = useQuizStore((state) => state.quizzes);
+  const storeQuestionsMap = useQuizStore((state) => state.questions);
+  const addQuestion = useQuizStore((state) => state.addQuestion);
+  const updateQuestion = useQuizStore((state) => state.updateQuestion);
+  const deleteQuestion = useQuizStore((state) => state.deleteQuestion);
+
+  const currentQuiz = quizzes.find((q) => q.id === numId);
+  const questions = storeQuestionsMap[numId] || [];
+
   const [modalOpen, setModalOpen] = useState(false);
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState<QuestionItem | null>(null);
@@ -127,31 +84,22 @@ export default function AdminQuizQuestionsPage() {
     }
 
     if (editingQuestion) {
-      setQuestions((prev) =>
-        prev.map((q) =>
-          q.id === editingQuestion.id
-            ? {
-                ...q,
-                question: newQuestionText,
-                type: newType,
-                options,
-                points,
-                explanation,
-              }
-            : q
-        )
-      );
-      toast.success("Question updated successfully");
-    } else {
-      const newQ: QuestionItem = {
-        id: Date.now(),
+      updateQuestion(numId, editingQuestion.id, {
         question: newQuestionText,
         type: newType,
         options,
         points,
         explanation,
-      };
-      setQuestions((prev) => [...prev, newQ]);
+      });
+      toast.success("Question updated successfully");
+    } else {
+      addQuestion(numId, {
+        question: newQuestionText,
+        type: newType,
+        options,
+        points,
+        explanation,
+      });
       toast.success("Question added successfully");
     }
     setModalOpen(false);
@@ -159,7 +107,7 @@ export default function AdminQuizQuestionsPage() {
 
   const handleDelete = (id: number) => {
     if (!confirm("Delete this question?")) return;
-    setQuestions((prev) => prev.filter((q) => q.id !== id));
+    deleteQuestion(numId, id);
     toast.success("Question deleted");
   };
 
@@ -168,11 +116,10 @@ export default function AdminQuizQuestionsPage() {
     setGeneratingAi(true);
 
     setTimeout(() => {
-      const generated: QuestionItem[] = [
+      const generated = [
         {
-          id: Date.now() + 1,
           question: `What is the highest mountain peak in Africa?`,
-          type: "multiple_choice",
+          type: "multiple_choice" as const,
           options: [
             { text: "Mount Kilimanjaro", is_correct: true },
             { text: "Mount Kenya", is_correct: false },
@@ -183,9 +130,8 @@ export default function AdminQuizQuestionsPage() {
           explanation: "Mount Kilimanjaro stands at 5,895 meters above sea level.",
         },
         {
-          id: Date.now() + 2,
           question: `Which country features the Maple leaf on its national flag?`,
-          type: "multiple_choice",
+          type: "multiple_choice" as const,
           options: [
             { text: "Canada", is_correct: true },
             { text: "Norway", is_correct: false },
@@ -197,12 +143,12 @@ export default function AdminQuizQuestionsPage() {
         },
       ];
 
-      setQuestions((prev) => [...prev, ...generated]);
+      generated.forEach((g) => addQuestion(numId, g));
       setGeneratingAi(false);
       setAiModalOpen(false);
       setAiPrompt("");
       toast.success(`Successfully generated and added ${generated.length} questions!`);
-    }, 1200);
+    }, 1000);
   };
 
   return (

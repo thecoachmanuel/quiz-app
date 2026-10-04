@@ -1,5 +1,6 @@
 /** @format */
 "use client";
+import { useContestStore } from "@/stores/contestStore";
 import { useGetQuery } from "@/hooks/mutate/useGetQuery";
 import { usePageComponent } from "@/hooks/usePageComponent";
 import { ContestApiResponse } from "@/types/contest";
@@ -30,7 +31,7 @@ const FirstThreeContest = ({ slug }: { slug: string }) => {
   const token = getToken();
 
   const {
-    data: contests,
+    data: apiContests,
     isLoading,
     refetch,
   } = useGetQuery<ContestApiResponse>({
@@ -45,6 +46,15 @@ const FirstThreeContest = ({ slug }: { slug: string }) => {
       sort_by: "asc",
     },
   });
+
+  const getFrontendContests = useContestStore((state) => state.getFrontendContests);
+  const storeContests = getFrontendContests({
+    page: 1,
+    per_page: 3,
+  });
+
+  const contests =
+    apiContests?.data && apiContests.data.length > 0 ? apiContests : storeContests;
 
   return (
     <div className="custom-container stp-30 sbp-30">
@@ -61,7 +71,7 @@ const FirstThreeContest = ({ slug }: { slug: string }) => {
       {/* quiz list */}
 
       <div className="stp-15">
-        {isLoading ? (
+        {isLoading && !contests ? (
           <Skeleton total={9} />
         ) : (
           <Contests contests={contests} refetch={refetch} />

@@ -7,93 +7,19 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-interface QuizItem {
-  id: number;
-  title: string;
-  category: string;
-  level: string;
-  total_questions: number;
-  duration_minutes: number;
-  reward_coins: number;
-  play_count: number;
-  status: "published" | "draft";
-  image?: string;
-}
-
-const MOCK_QUIZZES: QuizItem[] = [
-  {
-    id: 1,
-    title: "World Capitals & Geography Blitz",
-    category: "Geography",
-    level: "Intermediate",
-    total_questions: 15,
-    duration_minutes: 5,
-    reward_coins: 50,
-    play_count: 1420,
-    status: "published",
-  },
-  {
-    id: 2,
-    title: "Mastering Science & Physics",
-    category: "Science",
-    level: "Advanced",
-    total_questions: 20,
-    duration_minutes: 10,
-    reward_coins: 100,
-    play_count: 980,
-    status: "published",
-  },
-  {
-    id: 3,
-    title: "Ancient Civilizations & History",
-    category: "History",
-    level: "Beginner",
-    total_questions: 10,
-    duration_minutes: 4,
-    reward_coins: 30,
-    play_count: 2150,
-    status: "published",
-  },
-  {
-    id: 4,
-    title: "Global Cinema & Academy Awards",
-    category: "Entertainment",
-    level: "Intermediate",
-    total_questions: 12,
-    duration_minutes: 6,
-    reward_coins: 40,
-    play_count: 730,
-    status: "draft",
-  },
-  {
-    id: 5,
-    title: "Tech Giants & Computer Science",
-    category: "Technology",
-    level: "Advanced",
-    total_questions: 25,
-    duration_minutes: 12,
-    reward_coins: 150,
-    play_count: 1890,
-    status: "published",
-  },
-  {
-    id: 6,
-    title: "Premier League & Football Trivia",
-    category: "Sports",
-    level: "Beginner",
-    total_questions: 15,
-    duration_minutes: 5,
-    reward_coins: 45,
-    play_count: 3100,
-    status: "published",
-  },
-];
+import { useQuizStore, QuizItem } from "@/stores/quizStore";
 
 export default function AdminQuizzesPage() {
-  const [quizzes, setQuizzes] = useState<QuizItem[]>(MOCK_QUIZZES);
+  const storeQuizzes = useQuizStore((state) => state.quizzes);
+  const toggleQuizStatus = useQuizStore((state) => state.toggleQuizStatus);
+  const deleteQuiz = useQuizStore((state) => state.deleteQuiz);
+  const setQuizzes = useQuizStore((state) => state.setQuizzes);
+
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
+
+  const quizzes = storeQuizzes;
 
   useEffect(() => {
     fetchQuizzes();
@@ -107,30 +33,26 @@ export default function AdminQuizzesPage() {
         setQuizzes(res.data);
       }
     } catch {
-      setQuizzes(MOCK_QUIZZES);
+      // Keep store quizzes as fallback
     } finally {
       setLoading(false);
     }
   };
 
   const toggleStatus = (id: number) => {
-    setQuizzes((prev) =>
-      prev.map((q) => {
-        if (q.id === id) {
-          const next = q.status === "published" ? "draft" : "published";
-          toast.success(
-            `Quiz "${q.title}" ${next === "published" ? "published" : "set to draft"}`
-          );
-          return { ...q, status: next };
-        }
-        return q;
-      })
-    );
+    const quiz = quizzes.find((q) => q.id === id);
+    toggleQuizStatus(id);
+    if (quiz) {
+      const next = quiz.status === "published" ? "draft" : "published";
+      toast.success(
+        `Quiz "${quiz.title}" ${next === "published" ? "published" : "set to draft"}`
+      );
+    }
   };
 
   const handleDelete = (id: number) => {
     if (!confirm("Are you sure you want to delete this quiz?")) return;
-    setQuizzes((prev) => prev.filter((q) => q.id !== id));
+    deleteQuiz(id);
     toast.success("Quiz deleted successfully");
   };
 

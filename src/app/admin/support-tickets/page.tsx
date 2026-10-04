@@ -5,94 +5,14 @@ import AdminPageHeader, { TabButton } from "@/components/admin/AdminPageHeader";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface TicketMessage {
-  sender: "user" | "admin";
-  sender_name: string;
-  message: string;
-  time: string;
-}
-
-interface SupportTicket {
-  id: number;
-  ticket_no: string;
-  user_name: string;
-  user_email: string;
-  subject: string;
-  priority: "low" | "medium" | "high";
-  status: "open" | "answered" | "closed";
-  created_at: string;
-  messages: TicketMessage[];
-}
-
-const INITIAL_TICKETS: SupportTicket[] = [
-  {
-    id: 1,
-    ticket_no: "TK-10829",
-    user_name: "Alex Morgan",
-    user_email: "alex.morgan@example.com",
-    subject: "Coins not credited after Stripe payment",
-    priority: "high",
-    status: "open",
-    created_at: "2024-03-03 14:10",
-    messages: [
-      {
-        sender: "user",
-        sender_name: "Alex Morgan",
-        message:
-          "I purchased the 500 Coins bundle 20 minutes ago, but my balance has not updated. Transaction ID is PAY-84729103.",
-        time: "2024-03-03 14:10",
-      },
-    ],
-  },
-  {
-    id: 2,
-    ticket_no: "TK-10820",
-    user_name: "Sophia Chen",
-    user_email: "sophia.c@example.com",
-    subject: "How does the referral bonus calculation work?",
-    priority: "low",
-    status: "answered",
-    created_at: "2024-03-02 09:30",
-    messages: [
-      {
-        sender: "user",
-        sender_name: "Sophia Chen",
-        message:
-          "Hi team, if my friend signs up with my code and plays 3 quizzes, when do I receive the 100 bonus coins?",
-        time: "2024-03-02 09:30",
-      },
-      {
-        sender: "admin",
-        sender_name: "Admin Support",
-        message:
-          "Hello Sophia, referral bonus coins are automatically deposited once your referred friend completes their first paid quiz or 3 practice quizzes!",
-        time: "2024-03-02 10:15",
-      },
-    ],
-  },
-  {
-    id: 3,
-    ticket_no: "TK-10795",
-    user_name: "David Miller",
-    user_email: "d.miller@example.com",
-    subject: "App crashes when opening Hexling on iOS",
-    priority: "medium",
-    status: "closed",
-    created_at: "2024-02-28 16:45",
-    messages: [
-      {
-        sender: "user",
-        sender_name: "David Miller",
-        message:
-          "On Safari iOS 17.2, the hexagonal grid overlaps with bottom navigation bar.",
-        time: "2024-02-28 16:45",
-      },
-    ],
-  },
-];
+import { useSupportTicketStore, SupportTicket } from "@/stores/supportTicketStore";
 
 export default function AdminSupportTicketsPage() {
-  const [tickets, setTickets] = useState<SupportTicket[]>(INITIAL_TICKETS);
+  const tickets = useSupportTicketStore((state) => state.tickets);
+  const replyTicket = useSupportTicketStore((state) => state.replyTicket);
+  const updateStatus = useSupportTicketStore((state) => state.updateStatus);
+  const deleteTicket = useSupportTicketStore((state) => state.deleteTicket);
+
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
@@ -102,31 +22,22 @@ export default function AdminSupportTicketsPage() {
     e.preventDefault();
     if (!replyText.trim() || !selectedTicket) return;
 
-    const newMsg: TicketMessage = {
-      sender: "admin",
-      sender_name: "Support Admin",
-      message: replyText.trim(),
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setTickets((prev) =>
-      prev.map((t) =>
-        t.id === selectedTicket.id
-          ? {
-              ...t,
-              status: "answered",
-              messages: [...t.messages, newMsg],
-            }
-          : t
-      )
-    );
+    replyTicket(selectedTicket.id, replyText.trim(), "Support Admin");
 
     setSelectedTicket((prev) =>
       prev
         ? {
             ...prev,
             status: "answered",
-            messages: [...prev.messages, newMsg],
+            messages: [
+              ...prev.messages,
+              {
+                sender: "admin",
+                sender_name: "Support Admin",
+                message: replyText.trim(),
+                time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+              },
+            ],
           }
         : null
     );
@@ -136,9 +47,7 @@ export default function AdminSupportTicketsPage() {
   };
 
   const handleCloseTicket = (id: number) => {
-    setTickets((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, status: "closed" } : t))
-    );
+    updateStatus(id, "closed");
     setSelectedTicket((prev) => (prev ? { ...prev, status: "closed" } : null));
     toast.success("Ticket closed");
   };

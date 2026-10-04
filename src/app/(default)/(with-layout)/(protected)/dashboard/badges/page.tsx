@@ -6,13 +6,19 @@ import { useGetQuery } from "@/hooks/mutate/useGetQuery";
 import { useTranslations } from "@/providers/TranslationProviders";
 import BadgesList from "./BadgeList";
 
+import { useBadgeStore } from "@/stores/badgeStore";
+
 export default function BadgesPage() {
   const { tran } = useTranslations();
-  const { data: badges, isLoading } = useGetQuery({
+  const { data: apiBadges, isLoading } = useGetQuery({
     url: `/profile/badges`,
   });
 
-  if (isLoading) return <Loader />;
+  const getFrontendBadges = useBadgeStore((state) => state.getFrontendBadges);
+  const storeBadges = getFrontendBadges();
+  const badges = apiBadges && apiBadges.length > 0 ? apiBadges : storeBadges;
+
+  if (isLoading && !badges?.length) return <Loader />;
 
   return (
     <div className="bg-primary/5 rounded-xl p-2 sm:p-6">

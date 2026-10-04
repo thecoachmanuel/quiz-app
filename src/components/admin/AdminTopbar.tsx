@@ -2,6 +2,7 @@
 
 import { ADMIN_MENU } from "@/configs/adminMenu";
 import { useAdminAuthStore } from "@/stores/adminAuthStore";
+import { useSiteSettingsStore } from "@/stores/siteSettingsStore";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -43,6 +44,7 @@ const ALL_LINKS = flattenMenu(ADMIN_MENU);
 export default function AdminTopbar({ onToggleSidebar }: AdminTopbarProps) {
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAdminAuthStore();
+  const { settings } = useSiteSettingsStore();
 
   const [isDark, setIsDark] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);

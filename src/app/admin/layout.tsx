@@ -3,6 +3,13 @@
 import AdminLayoutWrapper from "@/components/admin/AdminLayoutWrapper";
 import "@/styles/admin.css";
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 export const metadata: Metadata = {
   title: "Quizix Admin",
@@ -15,7 +22,7 @@ export default function AdminRootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <div className={inter.className}>
       <script
         dangerouslySetInnerHTML={{
           __html: `
@@ -35,6 +42,6 @@ export default function AdminRootLayout({
         }}
       />
       <AdminLayoutWrapper>{children}</AdminLayoutWrapper>
-    </>
+    </div>
   );
 }

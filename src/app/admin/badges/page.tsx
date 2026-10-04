@@ -5,62 +5,15 @@ import AdminPageHeader from "@/components/admin/AdminPageHeader";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface BadgeItem {
-  id: number;
-  title: string;
-  description: string;
-  icon: string;
-  criteria: string;
-  reward_coins: number;
-  unlocked_count: number;
-  status: "active" | "inactive";
-}
-
-const INITIAL_BADGES: BadgeItem[] = [
-  {
-    id: 1,
-    title: "Trivia Rookie",
-    description: "Complete your first 5 trivia quizzes.",
-    icon: "ph-sparkle",
-    criteria: "5 Quizzes Completed",
-    reward_coins: 50,
-    unlocked_count: 820,
-    status: "active",
-  },
-  {
-    id: 2,
-    title: "Quiz Grandmaster",
-    description: "Complete 100 quizzes with score above 80%.",
-    icon: "ph-crown",
-    criteria: "100 Quizzes > 80%",
-    reward_coins: 500,
-    unlocked_count: 64,
-    status: "active",
-  },
-  {
-    id: 3,
-    title: "Contest Champion",
-    description: "Secure 1st place in any official trivia contest.",
-    icon: "ph-trophy",
-    criteria: "1st Place Contest Win",
-    reward_coins: 1000,
-    unlocked_count: 18,
-    status: "active",
-  },
-  {
-    id: 4,
-    title: "Vocabulary Maestro",
-    description: "Solve 10 Wordling puzzles with zero missed attempts.",
-    icon: "ph-spell-check",
-    criteria: "10 Perfect Wordling Solves",
-    reward_coins: 200,
-    unlocked_count: 145,
-    status: "active",
-  },
-];
+import { useBadgeStore, BadgeItem } from "@/stores/badgeStore";
 
 export default function AdminBadgesPage() {
-  const [badges, setBadges] = useState<BadgeItem[]>(INITIAL_BADGES);
+  const badges = useBadgeStore((state) => state.badges);
+  const addBadge = useBadgeStore((state) => state.addBadge);
+  const updateBadge = useBadgeStore((state) => state.updateBadge);
+  const deleteBadge = useBadgeStore((state) => state.deleteBadge);
+  const toggleBadgeStatus = useBadgeStore((state) => state.toggleBadgeStatus);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<BadgeItem | null>(null);
 
@@ -95,46 +48,36 @@ export default function AdminBadgesPage() {
     if (!title.trim()) return;
 
     if (editing) {
-      setBadges((prev) =>
-        prev.map((b) =>
-          b.id === editing.id
-            ? {
-                ...b,
-                title,
-                description: desc,
-                icon,
-                criteria,
-                reward_coins: reward,
-              }
-            : b
-        )
-      );
-      toast.success("Badge updated");
-    } else {
-      const newBadge: BadgeItem = {
-        id: Date.now(),
-        title,
+      updateBadge(editing.id, {
+        title: title.trim(),
         description: desc,
         icon,
         criteria,
-        reward_coins: reward,
+        reward_coins: Number(reward),
+      });
+      toast.success("Badge updated");
+    } else {
+      addBadge({
+        title: title.trim(),
+        description: desc,
+        icon,
+        criteria,
+        reward_coins: Number(reward),
         unlocked_count: 0,
         status: "active",
-      };
-      setBadges((prev) => [...prev, newBadge]);
+      });
       toast.success("Badge created");
     }
     setModalOpen(false);
   };
 
   const toggleStatus = (id: number) => {
-    setBadges((prev) =>
-      prev.map((b) =>
-        b.id === id
-          ? { ...b, status: b.status === "active" ? "inactive" : "active" }
-          : b
-      )
-    );
+    const badge = badges.find((b) => b.id === id);
+    toggleBadgeStatus(id);
+    if (badge) {
+      const next = badge.status === "active" ? "inactive" : "active";
+      toast.success(`Badge is now ${next}`);
+    }
   };
 
   const columns = [

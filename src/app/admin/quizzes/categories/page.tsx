@@ -6,68 +6,14 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface CategoryItem {
-  id: number;
-  title: string;
-  slug: string;
-  icon: string;
-  quizzes_count: number;
-  status: "active" | "inactive";
-}
-
-const INITIAL_CATEGORIES: CategoryItem[] = [
-  {
-    id: 1,
-    title: "Geography",
-    slug: "geography",
-    icon: "ph-globe-hemisphere-west",
-    quizzes_count: 24,
-    status: "active",
-  },
-  {
-    id: 2,
-    title: "Science & Nature",
-    slug: "science-nature",
-    icon: "ph-atom",
-    quizzes_count: 18,
-    status: "active",
-  },
-  {
-    id: 3,
-    title: "History",
-    slug: "history",
-    icon: "ph-hourglass",
-    quizzes_count: 15,
-    status: "active",
-  },
-  {
-    id: 4,
-    title: "Entertainment & Movies",
-    slug: "entertainment-movies",
-    icon: "ph-film-strip",
-    quizzes_count: 29,
-    status: "active",
-  },
-  {
-    id: 5,
-    title: "Technology",
-    slug: "technology",
-    icon: "ph-cpu",
-    quizzes_count: 22,
-    status: "active",
-  },
-  {
-    id: 6,
-    title: "Sports & Athletics",
-    slug: "sports-athletics",
-    icon: "ph-football",
-    quizzes_count: 31,
-    status: "active",
-  },
-];
+import { useQuizStore, CategoryItem } from "@/stores/quizStore";
 
 export default function QuizCategoriesPage() {
-  const [categories, setCategories] = useState<CategoryItem[]>(INITIAL_CATEGORIES);
+  const categories = useQuizStore((state) => state.categories);
+  const addCategory = useQuizStore((state) => state.addCategory);
+  const updateCategory = useQuizStore((state) => state.updateCategory);
+  const deleteCategory = useQuizStore((state) => state.deleteCategory);
+
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null);
@@ -96,53 +42,36 @@ export default function QuizCategoriesPage() {
       return;
     }
 
-    const slug = formTitle
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)+/g, "");
-
     if (editingCategory) {
-      setCategories((prev) =>
-        prev.map((c) =>
-          c.id === editingCategory.id
-            ? { ...c, title: formTitle, slug, icon: formIcon }
-            : c
-        )
-      );
+      updateCategory(editingCategory.id, {
+        title: formTitle.trim(),
+        icon: formIcon,
+      });
       toast.success("Category updated successfully");
     } else {
-      const newCat: CategoryItem = {
-        id: Date.now(),
-        title: formTitle,
-        slug,
+      addCategory({
+        title: formTitle.trim(),
+        slug: "",
         icon: formIcon,
         quizzes_count: 0,
         status: "active",
-      };
-      setCategories((prev) => [...prev, newCat]);
+      });
       toast.success("Category created successfully");
     }
     setModalOpen(false);
   };
 
   const toggleStatus = (id: number) => {
-    setCategories((prev) =>
-      prev.map((c) => {
-        if (c.id === id) {
-          const next = c.status === "active" ? "inactive" : "active";
-          toast.success(
-            `Category ${c.title} is now ${next}`
-          );
-          return { ...c, status: next };
-        }
-        return c;
-      })
-    );
+    const cat = categories.find((c) => c.id === id);
+    if (!cat) return;
+    const next = cat.status === "active" ? "inactive" : "active";
+    updateCategory(id, { status: next });
+    toast.success(`Category ${cat.title} is now ${next}`);
   };
 
   const handleDelete = (id: number) => {
     if (!confirm("Are you sure?")) return;
-    setCategories((prev) => prev.filter((c) => c.id !== id));
+    deleteCategory(id);
     toast.success("Category deleted");
   };
 

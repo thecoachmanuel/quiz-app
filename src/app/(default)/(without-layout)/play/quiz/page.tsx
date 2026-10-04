@@ -33,6 +33,8 @@ const PageNotFound = dynamic(() => import("@/components/ui/PageNotFound"), {
   ssr: false,
 });
 
+import { useQuizStore } from "@/stores/quizStore";
+
 const PALY_TYPE = "quiz";
 
 export default function PlayQuiz() {
@@ -45,11 +47,20 @@ export default function PlayQuiz() {
   const { appInfo, user }: { appInfo: AppInfoType; user: UserType } =
     useAuthStore((state) => state);
 
-  const { data, isLoading, refetch, isFetching } = useGetQuery<
+  const { data: apiData, isLoading, refetch, isFetching } = useGetQuery<
     QuizQuestionType[] | any
   >({
     url: `questions/${quiz}${level ? `?level=${level}` : ""}`,
   });
+
+  const getFrontendQuizQuestions = useQuizStore(
+    (state) => state.getFrontendQuizQuestions
+  );
+  const storeQuestions = quiz ? getFrontendQuizQuestions(quiz) : [];
+  const data =
+    apiData && Array.isArray(apiData) && apiData.length > 0
+      ? apiData
+      : storeQuestions;
 
   const questionList = useMemo(() => {
     if (!data || !data?.length || !Array.isArray(data)) return [];

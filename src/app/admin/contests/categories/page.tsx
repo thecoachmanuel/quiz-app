@@ -6,24 +6,14 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface ContestCat {
-  id: number;
-  title: string;
-  slug: string;
-  contests_count: number;
-  status: "active" | "inactive";
-}
-
-const INITIAL_CONTEST_CATS: ContestCat[] = [
-  { id: 1, title: "General Trivia", slug: "general-trivia", contests_count: 12, status: "active" },
-  { id: 2, title: "Technology", slug: "technology", contests_count: 8, status: "active" },
-  { id: 3, title: "Science", slug: "science", contests_count: 6, status: "active" },
-  { id: 4, title: "Sports", slug: "sports", contests_count: 14, status: "active" },
-  { id: 5, title: "Entertainment", slug: "entertainment", contests_count: 9, status: "active" },
-];
+import { useContestStore, ContestCat } from "@/stores/contestStore";
 
 export default function ContestCategoriesPage() {
-  const [categories, setCategories] = useState<ContestCat[]>(INITIAL_CONTEST_CATS);
+  const categories = useContestStore((state) => state.categories);
+  const addCategory = useContestStore((state) => state.addCategory);
+  const updateCategory = useContestStore((state) => state.updateCategory);
+  const deleteCategory = useContestStore((state) => state.deleteCategory);
+
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<ContestCat | null>(null);
@@ -44,21 +34,26 @@ export default function ContestCategoriesPage() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
-    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 
     if (editing) {
-      setCategories((prev) =>
-        prev.map((c) => (c.id === editing.id ? { ...c, title, slug } : c))
-      );
+      updateCategory(editing.id, { title: title.trim() });
       toast.success("Category updated");
     } else {
-      setCategories((prev) => [
-        ...prev,
-        { id: Date.now(), title, slug, contests_count: 0, status: "active" },
-      ]);
+      addCategory({
+        title: title.trim(),
+        slug: "",
+        contests_count: 0,
+        status: "active",
+      });
       toast.success("Category created");
     }
     setModalOpen(false);
+  };
+
+  const handleDelete = (id: number) => {
+    if (!confirm("Are you sure?")) return;
+    deleteCategory(id);
+    toast.success("Category deleted");
   };
 
   const columns = [

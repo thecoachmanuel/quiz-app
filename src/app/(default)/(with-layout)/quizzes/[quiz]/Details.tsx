@@ -30,13 +30,15 @@ const PageNotFound = dynamic(() => import("@/components/ui/PageNotFound"), {
   ssr: false,
 });
 
+import { useQuizStore } from "@/stores/quizStore";
+
 export default function QuizDetails({ quiz }: { quiz: string }) {
   const token = getToken();
   const { tran } = useTranslations();
   const { modalRef, modal, setModal } = useClickOutside();
 
   const {
-    data: quizDetails,
+    data: apiQuizDetails,
     isLoading: isQuizListLoading,
     refetch,
   } = useGetQuery<QuizType>({
@@ -45,7 +47,13 @@ export default function QuizDetails({ quiz }: { quiz: string }) {
     queryKey: ["quiz-details", quiz],
   });
 
-  if (isQuizListLoading) return <Loader />;
+  const getFrontendQuizDetails = useQuizStore(
+    (state) => state.getFrontendQuizDetails
+  );
+  const storeQuizDetails = getFrontendQuizDetails(quiz);
+  const quizDetails = apiQuizDetails || storeQuizDetails;
+
+  if (isQuizListLoading && !quizDetails) return <Loader />;
 
   if (!quizDetails) return <PageNotFound />;
 

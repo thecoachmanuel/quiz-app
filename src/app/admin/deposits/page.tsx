@@ -5,80 +5,23 @@ import AdminPageHeader, { TabButton } from "@/components/admin/AdminPageHeader";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface DepositItem {
-  id: number;
-  trx_id: string;
-  user_name: string;
-  user_email: string;
-  gateway: string;
-  amount: number;
-  fee: number;
-  total: number;
-  status: "pending" | "completed" | "rejected";
-  created_at: string;
-}
-
-const INITIAL_DEPOSITS: DepositItem[] = [
-  {
-    id: 1,
-    trx_id: "DP-92841029",
-    user_name: "Alex Morgan",
-    user_email: "alex.morgan@example.com",
-    gateway: "Stripe",
-    amount: 100.0,
-    fee: 2.5,
-    total: 102.5,
-    status: "completed",
-    created_at: "2024-03-02 14:22",
-  },
-  {
-    id: 2,
-    trx_id: "DP-81729384",
-    user_name: "Sophia Chen",
-    user_email: "sophia.c@example.com",
-    gateway: "PayPal",
-    amount: 50.0,
-    fee: 1.5,
-    total: 51.5,
-    status: "completed",
-    created_at: "2024-03-01 09:15",
-  },
-  {
-    id: 3,
-    trx_id: "DP-71625344",
-    user_name: "David Miller",
-    user_email: "d.miller@example.com",
-    gateway: "Bank Transfer",
-    amount: 250.0,
-    fee: 0.0,
-    total: 250.0,
-    status: "pending",
-    created_at: "2024-03-03 11:45",
-  },
-  {
-    id: 4,
-    trx_id: "DP-62514399",
-    user_name: "Emma Watson",
-    user_email: "emma.w@example.com",
-    gateway: "Stripe",
-    amount: 25.0,
-    fee: 1.0,
-    total: 26.0,
-    status: "rejected",
-    created_at: "2024-02-28 17:30",
-  },
-];
+import { useFinanceStore, DepositItem } from "@/stores/financeStore";
 
 export default function AdminDepositsPage() {
-  const [deposits, setDeposits] = useState<DepositItem[]>(INITIAL_DEPOSITS);
+  const deposits = useFinanceStore((state) => state.deposits);
+  const approveDeposit = useFinanceStore((state) => state.approveDeposit);
+  const rejectDeposit = useFinanceStore((state) => state.rejectDeposit);
+
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedDeposit, setSelectedDeposit] = useState<DepositItem | null>(null);
 
   const handleAction = (id: number, newStatus: "completed" | "rejected") => {
-    setDeposits((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, status: newStatus } : d))
-    );
+    if (newStatus === "completed") {
+      approveDeposit(id);
+    } else {
+      rejectDeposit(id);
+    }
     toast.success(
       `Deposit #${id} has been ${newStatus === "completed" ? "approved" : "rejected"}`
     );

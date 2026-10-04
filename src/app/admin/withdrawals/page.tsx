@@ -5,73 +5,23 @@ import AdminPageHeader, { TabButton } from "@/components/admin/AdminPageHeader";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface WithdrawalItem {
-  id: number;
-  trx_id: string;
-  user_name: string;
-  user_email: string;
-  method: string;
-  account_info: string;
-  amount: number;
-  fee: number;
-  final_amount: number;
-  status: "pending" | "approved" | "rejected";
-  created_at: string;
-}
-
-const INITIAL_WITHDRAWALS: WithdrawalItem[] = [
-  {
-    id: 1,
-    trx_id: "WD-19283746",
-    user_name: "Alex Morgan",
-    user_email: "alex.morgan@example.com",
-    method: "PayPal",
-    account_info: "alex.morgan@example.com",
-    amount: 150.0,
-    fee: 3.0,
-    final_amount: 147.0,
-    status: "pending",
-    created_at: "2024-03-03 08:30",
-  },
-  {
-    id: 2,
-    trx_id: "WD-58392019",
-    user_name: "Sophia Chen",
-    user_email: "sophia.c@example.com",
-    method: "Bank Transfer",
-    account_info: "Chase Bank - Acc ending in 4109",
-    amount: 300.0,
-    fee: 5.0,
-    final_amount: 295.0,
-    status: "approved",
-    created_at: "2024-03-01 16:10",
-  },
-  {
-    id: 3,
-    trx_id: "WD-99482711",
-    user_name: "David Miller",
-    user_email: "d.miller@example.com",
-    method: "Crypto (USDT TRC20)",
-    account_info: "TXYZ...98214",
-    amount: 50.0,
-    fee: 1.0,
-    final_amount: 49.0,
-    status: "rejected",
-    created_at: "2024-02-27 12:00",
-  },
-];
+import { useFinanceStore, WithdrawalItem } from "@/stores/financeStore";
 
 export default function AdminWithdrawalsPage() {
-  const [withdrawals, setWithdrawals] =
-    useState<WithdrawalItem[]>(INITIAL_WITHDRAWALS);
+  const withdrawals = useFinanceStore((state) => state.withdrawals);
+  const approveWithdrawal = useFinanceStore((state) => state.approveWithdrawal);
+  const rejectWithdrawal = useFinanceStore((state) => state.rejectWithdrawal);
+
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
   const [selectedItem, setSelectedItem] = useState<WithdrawalItem | null>(null);
 
   const handleAction = (id: number, newStatus: "approved" | "rejected") => {
-    setWithdrawals((prev) =>
-      prev.map((w) => (w.id === id ? { ...w, status: newStatus } : w))
-    );
+    if (newStatus === "approved") {
+      approveWithdrawal(id);
+    } else {
+      rejectWithdrawal(id);
+    }
     toast.success(
       `Withdrawal #${id} has been ${newStatus === "approved" ? "approved & paid" : "rejected"}`
     );

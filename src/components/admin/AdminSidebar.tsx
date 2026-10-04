@@ -1,16 +1,14 @@
 "use client";
 
 import { ADMIN_MENU, AdminMenuItem } from "@/configs/adminMenu";
+import { useSiteSettingsStore } from "@/stores/siteSettingsStore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface AdminSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  logoLight?: string;
-  logoDark?: string;
 }
 
 // ---- Submenu Item ----
@@ -184,9 +182,12 @@ function SidebarNavItem({ menu }: { menu: AdminMenuItem }) {
 export default function AdminSidebar({
   isOpen,
   onClose,
-  logoLight = "/assets/admin/images/logo-light.png",
-  logoDark = "/assets/admin/images/logo-dark.png",
 }: AdminSidebarProps) {
+  const { settings } = useSiteSettingsStore();
+  const logoLight = settings.logo_light || "/assets/admin/images/logo-light.png";
+  const logoDark = settings.logo_dark || "/assets/admin/images/logo-dark.png";
+  const siteName = settings.site_name || "Quizix";
+
   return (
     <aside
       className={`admin-sidebar ${isOpen ? "opened" : "closed"}`}
@@ -197,12 +198,12 @@ export default function AdminSidebar({
         <Link href="/admin/dashboard" className="flex items-center gap-2.5">
           <img
             src={logoLight}
-            alt="Quizix"
+            alt={siteName}
             className="h-9 w-auto max-h-9 object-contain dark:hidden block application-logo"
           />
           <img
             src={logoDark}
-            alt="Quizix"
+            alt={siteName}
             className="h-9 w-auto max-h-9 object-contain hidden dark:block application-logo"
           />
         </Link>

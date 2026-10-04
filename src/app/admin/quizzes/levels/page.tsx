@@ -6,47 +6,14 @@ import Link from "next/link";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface LevelItem {
-  id: number;
-  title: string;
-  quizzes_count: number;
-  min_score: number;
-  bonus_multiplier: number;
-}
-
-const INITIAL_LEVELS: LevelItem[] = [
-  {
-    id: 1,
-    title: "Beginner",
-    quizzes_count: 14,
-    min_score: 50,
-    bonus_multiplier: 1.0,
-  },
-  {
-    id: 2,
-    title: "Intermediate",
-    quizzes_count: 28,
-    min_score: 65,
-    bonus_multiplier: 1.25,
-  },
-  {
-    id: 3,
-    title: "Advanced",
-    quizzes_count: 19,
-    min_score: 75,
-    bonus_multiplier: 1.5,
-  },
-  {
-    id: 4,
-    title: "Master",
-    quizzes_count: 8,
-    min_score: 85,
-    bonus_multiplier: 2.0,
-  },
-];
+import { useQuizStore, LevelItem } from "@/stores/quizStore";
 
 export default function QuizLevelsPage() {
-  const [levels, setLevels] = useState<LevelItem[]>(INITIAL_LEVELS);
+  const levels = useQuizStore((state) => state.levels);
+  const addLevel = useQuizStore((state) => state.addLevel);
+  const updateLevel = useQuizStore((state) => state.updateLevel);
+  const deleteLevel = useQuizStore((state) => state.deleteLevel);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingLevel, setEditingLevel] = useState<LevelItem | null>(null);
   const [title, setTitle] = useState("");
@@ -77,23 +44,19 @@ export default function QuizLevelsPage() {
     }
 
     if (editingLevel) {
-      setLevels((prev) =>
-        prev.map((l) =>
-          l.id === editingLevel.id
-            ? { ...l, title, min_score: minScore, bonus_multiplier: bonusMultiplier }
-            : l
-        )
-      );
+      updateLevel(editingLevel.id, {
+        title: title.trim(),
+        min_score: Number(minScore),
+        bonus_multiplier: Number(bonusMultiplier),
+      });
       toast.success("Level updated successfully");
     } else {
-      const newLvl: LevelItem = {
-        id: Date.now(),
-        title,
+      addLevel({
+        title: title.trim(),
         quizzes_count: 0,
-        min_score: minScore,
-        bonus_multiplier: bonusMultiplier,
-      };
-      setLevels((prev) => [...prev, newLvl]);
+        min_score: Number(minScore),
+        bonus_multiplier: Number(bonusMultiplier),
+      });
       toast.success("Level created successfully");
     }
     setModalOpen(false);
@@ -101,7 +64,7 @@ export default function QuizLevelsPage() {
 
   const handleDelete = (id: number) => {
     if (!confirm("Are you sure?")) return;
-    setLevels((prev) => prev.filter((l) => l.id !== id));
+    deleteLevel(id);
     toast.success("Level deleted");
   };
 

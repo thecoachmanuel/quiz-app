@@ -4,6 +4,7 @@
 import { useAuthStore } from "@/providers/AuthStoreProviders";
 import { useMenu } from "@/providers/MenuProvider";
 import { useTranslations } from "@/providers/TranslationProviders";
+import { useSiteSettingsStore } from "@/stores/siteSettingsStore";
 import { AppInfoType, SocialMediaItem } from "@/types";
 import { getPageUrl } from "@/utils/helper";
 import { ChatsIcon, MapPinIcon, PhoneCallIcon } from "@phosphor-icons/react/dist/ssr";
@@ -23,6 +24,7 @@ const SelectLanguage = dynamic(
 export default function Footer() {
   const { tran } = useTranslations();
   const { appInfo }: { appInfo: AppInfoType } = useAuthStore((state) => state);
+  const { settings } = useSiteSettingsStore();
 
   // social links - no need for useMemo here
   const socialLinks = appInfo?.application_info?.social_medias ?? [];
@@ -48,9 +50,10 @@ export default function Footer() {
     };
   }, [menus]);
 
-  if (!appInfo) {
-    return null;
-  }
+  // Use settings store as fallback contact info
+  const companyEmail = appInfo?.application_info?.company_info?.email || settings.company_email;
+  const companyPhone = appInfo?.application_info?.company_info?.phone || settings.company_phone;
+  const companyAddress = appInfo?.application_info?.company_info?.address || settings.address_line;
 
   return (
     <section className="relative overflow-hidden">
@@ -114,23 +117,19 @@ export default function Footer() {
                 <li>
                   <Link
                     className="flex items-center justify-start gap-2"
-                    href={
-                      "tel:" + appInfo?.application_info?.company_info?.phone
-                    }
+                    href={"tel:" + companyPhone}
                   >
                     <PhoneCallIcon className="text-xl" weight="fill" />
-                    {appInfo?.application_info?.company_info?.phone}
+                    {companyPhone}
                   </Link>
                 </li>
                 <li>
                   <Link
                     className="flex items-center justify-start gap-2"
-                    href={
-                      "mailto:" + appInfo?.application_info?.company_info?.email
-                    }
+                    href={"mailto:" + companyEmail}
                   >
                     <ChatsIcon weight="fill" className="text-xl" />
-                    {appInfo?.application_info?.company_info?.email}
+                    {companyEmail}
                   </Link>
                 </li>
                 <li>
@@ -153,7 +152,7 @@ export default function Footer() {
             <p>
               {tran("Copyright")} @ {new Date().getFullYear()}{" "}
               {appInfo?.application_info?.footer_text}{" "}
-              {appInfo?.application_info?.company_info?.name}
+              {appInfo?.application_info?.company_info?.name || settings.site_name}
             </p>
           </div>
           <div>

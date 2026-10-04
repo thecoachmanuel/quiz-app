@@ -6,8 +6,13 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
+import { useContestStore } from "@/stores/contestStore";
+
 export default function CreateContestPage() {
   const router = useRouter();
+  const addContest = useContestStore((state) => state.addContest);
+  const storeCategories = useContestStore((state) => state.categories);
+
   const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -18,17 +23,19 @@ export default function CreateContestPage() {
     entry_fee: 50,
     prize_pool: 1000,
     description: "",
-    status: "upcoming",
+    status: "upcoming" as "active" | "upcoming" | "ended",
   });
 
-  const categories = [
-    "General Trivia",
-    "Technology",
-    "Science",
-    "Sports",
-    "Entertainment",
-    "History",
-  ];
+  const categories = storeCategories.length
+    ? storeCategories.map((c) => c.title)
+    : [
+        "General Trivia",
+        "Technology",
+        "Science",
+        "Sports",
+        "Entertainment",
+        "History",
+      ];
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -47,11 +54,27 @@ export default function CreateContestPage() {
     }
 
     setSubmitting(true);
-    setTimeout(() => {
-      setSubmitting(false);
+    try {
+      addContest({
+        title: formData.title.trim(),
+        category: formData.category,
+        start_time: formData.start_time || new Date().toISOString(),
+        end_time: formData.end_time || new Date(Date.now() + 86400000 * 3).toISOString(),
+        entry_fee: Number(formData.entry_fee) || 0,
+        prize_pool: Number(formData.prize_pool) || 1000,
+        description: formData.description,
+        status: formData.status,
+        participants_count: 0,
+        image: "/contest-image.png",
+      });
+
       toast.success("Contest created successfully!");
       router.push("/admin/contests");
-    }, 600);
+    } catch {
+      toast.error("Failed to create contest");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

@@ -17,6 +17,8 @@ const Pagination = dynamic(() => import("@/components/ui/Pagination"), {
 
 const PER_PAGE_ITEM = 9;
 
+import { useQuizStore } from "@/stores/quizStore";
+
 const QuizList = () => {
   const token = getToken();
 
@@ -46,6 +48,17 @@ const QuizList = () => {
     },
   });
 
+  const getFrontendQuizzes = useQuizStore((state) => state.getFrontendQuizzes);
+  const storeQuizList = getFrontendQuizzes({
+    page,
+    per_page: PER_PAGE_ITEM,
+    search: debouncedSearchText,
+    category,
+  });
+
+  const effectiveQuizList =
+    quizList?.data && quizList.data.length > 0 ? quizList : storeQuizList;
+
   return (
     <React.Fragment>
       <div className="pt-6">
@@ -56,15 +69,15 @@ const QuizList = () => {
       </div>
       <Categories setSelectedCategory={handleCategoryChange} />
 
-      {isQuizListLoading ? (
+      {isQuizListLoading && !effectiveQuizList ? (
         <Skeleton total={3} />
       ) : (
-        <QuizItems quizList={quizList} refetch={refetch} />
+        <QuizItems quizList={effectiveQuizList} refetch={refetch} />
       )}
 
       <Pagination
         currentPage={page}
-        lastPage={quizList?.last_page ?? 1}
+        lastPage={effectiveQuizList?.last_page ?? 1}
         onPageChange={handlePageChange}
       />
     </React.Fragment>
