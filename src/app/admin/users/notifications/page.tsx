@@ -37,7 +37,14 @@ export default function SendNotificationPage() {
       setMessage(
         "Hi {{user_name}},\n\nCheck out your leaderboard standing this week and claim your reward coins in the app."
       );
+    } else if (val === "4") {
+      setSubject("Account Security: Enable 2FA on Quizix");
+      setMessage(
+        "Hi {{user_name}},\n\nProtect your account and rewards by enabling Two-Factor Authentication (2FA) in your profile settings today."
+      );
     }
+  };
+
   const sendNotification = useUserStore((state) => state.sendNotification);
   const users = useUserStore((state) => state.users);
 
