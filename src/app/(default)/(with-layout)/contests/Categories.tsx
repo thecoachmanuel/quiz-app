@@ -68,7 +68,6 @@ export default function Categories({
     from: 1,
     last_page: 1,
     last_page_url: "",
-    links: [],
     next_page_url: null,
     path: "",
     per_page: 20,
