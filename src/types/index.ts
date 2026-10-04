@@ -6,6 +6,7 @@ export interface CompanyInfoType {
   phone: string;
   website: string;
   description: string;
+  address?: string;
 }
 
 export interface ThemeColorType {

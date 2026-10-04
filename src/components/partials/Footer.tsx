@@ -53,7 +53,10 @@ export default function Footer() {
   // Use settings store as fallback contact info
   const companyEmail = appInfo?.application_info?.company_info?.email || settings.company_email;
   const companyPhone = appInfo?.application_info?.company_info?.phone || settings.company_phone;
-  const companyAddress = appInfo?.application_info?.company_info?.address || settings.address_line;
+  const companyAddress =
+    appInfo?.application_info?.address?.address ||
+    appInfo?.application_info?.company_info?.address ||
+    settings.address_line;
 
   return (
     <section className="relative overflow-hidden">
