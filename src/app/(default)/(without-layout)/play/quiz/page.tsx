@@ -68,12 +68,12 @@ export default function PlayQuiz() {
   }, [data]);
 
   useEffect(() => {
-    if (data && data?.status == "completed") {
+    if ((apiData as any)?.status == "completed") {
       push(
         `/result/quiz?quiz=${quiz}&username=${dataEncode(user?.username)}${level ? `&level_slug=${level}` : ""}`,
       );
     }
-  }, [data, level, push, quiz, user?.username]);
+  }, [apiData, level, push, quiz, user?.username]);
 
   const currentQuestion: QuizQuestionType = useMemo(() => {
     const currentQuestions = questionList?.filter(
