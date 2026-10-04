@@ -93,7 +93,7 @@ export default function AdminWithdrawalsPage() {
             {row.method}
           </span>
           <p className="text-[11px] text-[var(--admin-neutral-200)] truncate max-w-[180px]">
-            {row.account_info}
+            {row.account_info || "—"}
           </p>
         </div>
       ),
@@ -226,7 +226,7 @@ export default function AdminWithdrawalsPage() {
               <div className="flex justify-between py-2 border-b border-[var(--admin-neutral-30)] dark:border-[var(--admin-neutral-700)]">
                 <span className="text-[var(--admin-neutral-200)]">Account Details</span>
                 <span className="font-mono font-medium text-[var(--admin-neutral-900)] dark:text-white">
-                  {selectedItem.account_info}
+                  {selectedItem.account_info || "—"}
                 </span>
               </div>
               <div className="flex justify-between py-2 border-b border-[var(--admin-neutral-30)] dark:border-[var(--admin-neutral-700)]">

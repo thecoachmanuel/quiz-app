@@ -24,6 +24,7 @@ export interface WithdrawalItem {
   user_name: string;
   user_email: string;
   method: string;
+  account_info?: string;
   amount: number;
   fee: number;
   final_amount: number;
@@ -77,6 +78,7 @@ const DEFAULT_WITHDRAWALS: WithdrawalItem[] = [
     user_name: "Sophia Chen",
     user_email: "sophia.c@example.com",
     method: "PayPal",
+    account_info: "sophia.payouts@gmail.com",
     amount: 150.0,
     fee: 3.0,
     final_amount: 147.0,
@@ -89,6 +91,7 @@ const DEFAULT_WITHDRAWALS: WithdrawalItem[] = [
     user_name: "Alex Morgan",
     user_email: "alex.morgan@example.com",
     method: "Bank Transfer",
+    account_info: "Chase Bank - Acct ****4892",
     amount: 80.0,
     fee: 1.5,
     final_amount: 78.5,
